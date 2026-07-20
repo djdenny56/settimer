@@ -145,6 +145,33 @@ function Index() {
     setIdx(0);
   };
 
+  const settingsMatch = (a: Settings, b: Settings) =>
+    a.sets === b.sets &&
+    a.timePerSet === b.timePerSet &&
+    a.restBetweenSets === b.restBetweenSets &&
+    a.doubleSet === b.doubleSet &&
+    a.restBetweenSides === b.restBetweenSides;
+
+  const activeFavoriteId = favorites.find((f) => settingsMatch(f.settings, settings))?.id ?? null;
+
+  const saveFavorite = () => {
+    const suggested = `${settings.sets}×${settings.timePerSet}s`;
+    const name = window.prompt("Name this favorite", suggested)?.trim();
+    if (!name) return;
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    setFavorites((f) => [...f, { id, name, settings: { ...settings } }]);
+  };
+
+  const applyFavorite = (fav: Favorite) => {
+    if (running) return;
+    setSettings({ ...DEFAULT_SETTINGS, ...fav.settings });
+  };
+
+  const deleteFavorite = (id: string) => {
+    setFavorites((f) => f.filter((x) => x.id !== id));
+  };
+
+
   const displayRemaining = running
     ? Math.max(0, remaining)
     : settings.timePerSet;
