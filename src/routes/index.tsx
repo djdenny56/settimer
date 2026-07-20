@@ -442,14 +442,42 @@ function Index() {
             <div className="grid grid-cols-3 gap-3">
               {favorites.map((fav) => {
                 const active = fav.id === activeFavoriteId;
+                const isDragOver = dragOverId === fav.id && dragId !== fav.id;
                 return (
                   <div
                     key={fav.id}
-                    className={`relative rounded-2xl p-0.5 ${
+                    draggable={!running}
+                    onDragStart={(e) => {
+                      if (running) return;
+                      setDragId(fav.id);
+                      e.dataTransfer.effectAllowed = "move";
+                    }}
+                    onDragOver={(e) => {
+                      if (dragId === null) return;
+                      e.preventDefault();
+                      e.dataTransfer.dropEffect = "move";
+                      if (dragOverId !== fav.id) setDragOverId(fav.id);
+                    }}
+                    onDragLeave={() => {
+                      if (dragOverId === fav.id) setDragOverId(null);
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      if (dragId) reorderFavorite(dragId, fav.id);
+                      setDragId(null);
+                      setDragOverId(null);
+                    }}
+                    onDragEnd={() => {
+                      setDragId(null);
+                      setDragOverId(null);
+                    }}
+                    className={`relative rounded-2xl p-0.5 transition-all ${
                       active
                         ? "bg-gradient-to-br from-yellow-300 via-pink-400 to-cyan-300"
                         : ""
-                    }`}
+                    } ${dragId === fav.id ? "opacity-40" : ""} ${
+                      isDragOver ? "scale-105 ring-2 ring-white/70" : ""
+                    } ${running ? "" : "cursor-grab active:cursor-grabbing"}`}
                     style={active ? undefined : { background: appSettings.tileBg }}
                   >
                     <button
@@ -481,6 +509,7 @@ function Index() {
                 );
               })}
             </div>
+
           )}
         </div>
 
