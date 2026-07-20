@@ -262,7 +262,7 @@ function Index() {
           />
 
           <div
-            className={`rounded-2xl bg-gradient-to-br from-yellow-300/80 via-pink-400/80 via-cyan-300/80 to-lime-300/80 p-[1px] ${
+            className={`rounded-2xl bg-gradient-to-br from-yellow-300/80 via-pink-400/80 to-cyan-300/80 p-[1px] ${
               running ? "opacity-60" : ""
             }`}
           >
