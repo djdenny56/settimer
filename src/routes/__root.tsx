@@ -77,20 +77,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Workout Timer" },
+      { title: "Set Timer" },
       {
         name: "description",
         content:
-          "A dead-simple workout timer with reps, rest, sets, double-set support, and sound + vibration cues.",
+          "A dead-simple workout timer: sets, time per set, rest, and optional double-set with sound + vibration cues.",
       },
-      { property: "og:title", content: "Workout Timer" },
+      { property: "og:title", content: "Set Timer" },
       {
         property: "og:description",
         content:
-          "Set reps, time per rep, and rest, then go. Sound + vibration cues on every phase.",
+          "A dead-simple workout timer: sets, time per set, rest, and optional double-set with sound + vibration cues.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Set Timer" },
+      { name: "twitter:description", content: "A dead-simple workout timer: sets, time per set, rest, and optional double-set with sound + vibration cues." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3478977e-1dba-4d55-8976-0c291ea162d3/id-preview-89bcac82--4b017bb5-abea-4218-8f7b-f6a68a5e2d57.lovable.app-1784556099298.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3478977e-1dba-4d55-8976-0c291ea162d3/id-preview-89bcac82--4b017bb5-abea-4218-8f7b-f6a68a5e2d57.lovable.app-1784556099298.png" },
     ],
     links: [
       {

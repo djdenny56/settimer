@@ -15,16 +15,16 @@ const STORAGE_KEY = "workout-timer-settings";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Workout Timer" },
+      { title: "Set Timer" },
       {
         name: "description",
         content:
           "A dead-simple workout timer: sets, time per set, rest, and optional double-set with sound + vibration cues.",
       },
-      { property: "og:title", content: "Workout Timer" },
+      { property: "og:title", content: "Set Timer" },
       {
         property: "og:description",
-        content: "Set it up and go. Sound + vibration cues on every phase.",
+        content: "A dead-simple workout timer: sets, time per set, rest, and optional double-set with sound + vibration cues.",
       },
     ],
   }),
