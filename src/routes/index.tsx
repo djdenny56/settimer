@@ -1,24 +1,73 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { SetupForm } from "@/components/timer/SetupForm";
+import { RunningTimer } from "@/components/timer/RunningTimer";
+import { DEFAULT_SETTINGS, type Settings } from "@/lib/timer/schedule";
+import { unlockAudio } from "@/lib/timer/cues";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
+const STORAGE_KEY = "workout-timer-settings";
+
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Workout Timer" },
+      {
+        name: "description",
+        content:
+          "A dead-simple workout timer: reps, rest, sets, and double-set support with sound and vibration cues.",
+      },
+      { property: "og:title", content: "Workout Timer" },
+      {
+        property: "og:description",
+        content:
+          "Set reps, time per rep, and rest, then go. Sound + vibration cues on every phase.",
+      },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
+  const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
+  const [running, setRunning] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        setSettings({ ...DEFAULT_SETTINGS, ...parsed });
+      }
+    } catch {
+      // ignore
+    }
+    setLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (!loaded) return;
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    } catch {
+      // ignore
+    }
+  }, [settings, loaded]);
+
+  if (running) {
+    return (
+      <RunningTimer settings={settings} onExit={() => setRunning(false)} />
+    );
+  }
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <SetupForm
+      settings={settings}
+      onChange={setSettings}
+      onStart={() => {
+        unlockAudio();
+        setRunning(true);
+      }}
+    />
   );
 }
