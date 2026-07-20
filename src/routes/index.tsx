@@ -155,10 +155,7 @@ function Index() {
 
         {/* Timer display */}
         <div className="rounded-[2rem] bg-gradient-to-br from-yellow-300 via-pink-400 to-cyan-300 p-1 shadow-2xl shadow-black/25">
-          <div className="relative flex flex-col items-center gap-3 overflow-hidden rounded-[calc(2rem-4px)] bg-white/15 px-4 py-8 backdrop-blur-sm">
-            <div className="absolute inset-x-0 top-0 h-2 bg-gradient-to-r from-yellow-300 via-pink-400 to-cyan-300" />
-            <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-cyan-300 via-pink-400 to-yellow-300 opacity-60" />
-
+          <div className="relative flex flex-col items-center gap-3 overflow-hidden rounded-[calc(2rem-4px)] bg-[#2a1a4a] px-4 py-8">
             <div className="relative flex h-60 w-60 items-center justify-center">
               <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100">
                 <defs>
