@@ -362,11 +362,11 @@ function Field({
   const clamp = (n: number) => Math.max(min, Math.min(max, n));
   return (
     <div
-      className={`rounded-2xl bg-gradient-to-br from-yellow-300/80 via-pink-400/80 to-cyan-300/80 p-[1px] ${
+      className={`rounded-2xl bg-[#2a1a4a] p-3 ${
         disabled ? "opacity-60" : ""
       }`}
     >
-      <div className="flex flex-col items-center gap-2 rounded-[calc(1rem-1px)] bg-white/15 p-3 backdrop-blur-sm">
+      <div className="flex flex-col items-center gap-2">
         <span className="text-center text-xs font-bold leading-tight">{label}</span>
         <input
           type="number"
