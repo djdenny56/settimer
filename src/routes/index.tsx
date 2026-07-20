@@ -218,7 +218,7 @@ function Index() {
 
         {/* Timer display */}
         <div className="rounded-[2rem] bg-gradient-to-br from-yellow-300 via-pink-400 to-cyan-300 p-1 shadow-2xl shadow-black/25">
-          <div className="relative flex flex-col items-center gap-3 overflow-hidden rounded-[calc(2rem-4px)] bg-[#2a1a4a] px-4 py-8">
+          <div className="relative flex flex-col items-center gap-3 overflow-hidden rounded-[calc(2rem-4px)] px-4 py-8" style={{ background: appSettings.tileBg }}>
             <div className="relative flex h-60 w-60 items-center justify-center">
               <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100">
                 <defs>
@@ -285,7 +285,7 @@ function Index() {
                 aria-label="Stop"
                 className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 via-pink-400 to-cyan-300 p-0.5 transition-transform active:scale-[0.96]"
               >
-                <span className="flex h-full w-full items-center justify-center rounded-full bg-[#2a1a4a] text-white transition-colors hover:bg-[#362260]">
+                <span className="flex h-full w-full items-center justify-center rounded-full text-white transition-opacity hover:opacity-90" style={{ background: appSettings.tileBg }}>
                   <RotateCcw className="h-5 w-5" />
                 </span>
               </button>
@@ -313,7 +313,7 @@ function Index() {
                 aria-label="Skip"
                 className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-cyan-300 via-pink-400 to-yellow-300 p-0.5 transition-transform active:scale-[0.96]"
               >
-                <span className="flex h-full w-full items-center justify-center rounded-full bg-[#2a1a4a] text-white transition-colors hover:bg-[#362260]">
+                <span className="flex h-full w-full items-center justify-center rounded-full text-white transition-opacity hover:opacity-90" style={{ background: appSettings.tileBg }}>
                   <SkipForward className="h-5 w-5" />
                 </span>
               </button>
