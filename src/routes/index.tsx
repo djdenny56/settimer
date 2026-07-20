@@ -41,11 +41,26 @@ function Index() {
   const [appSettings] = useAppSettings();
   const [loaded, setLoaded] = useState(false);
   const [favorites, setFavorites] = useState<Favorite[]>([]);
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
   const [paused, setPaused] = useState(false);
   const [idx, setIdx] = useState(0);
   const [done, setDone] = useState(false);
   const wakeRef = useRef<WakeLockSentinel | null>(null);
+
+  const reorderFavorite = (fromId: string, toId: string) => {
+    if (fromId === toId) return;
+    setFavorites((f) => {
+      const from = f.findIndex((x) => x.id === fromId);
+      const to = f.findIndex((x) => x.id === toId);
+      if (from < 0 || to < 0) return f;
+      const next = f.slice();
+      const [m] = next.splice(from, 1);
+      next.splice(to, 0, m);
+      return next;
+    });
+  };
 
   useEffect(() => {
     try {
