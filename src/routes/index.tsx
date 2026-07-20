@@ -7,7 +7,7 @@ import {
   phaseLabel,
   type Settings,
 } from "@/lib/timer/schedule";
-import { playCue, unlockAudio } from "@/lib/timer/cues";
+import { playCue, setCueOptions, unlockAudio } from "@/lib/timer/cues";
 import { useCountdown } from "@/hooks/useCountdown";
 import { useAppSettings } from "@/lib/appSettings";
 
