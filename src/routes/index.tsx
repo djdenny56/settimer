@@ -84,6 +84,10 @@ function Index() {
     }
   }, [favorites, loaded]);
 
+  useEffect(() => {
+    setCueOptions({ sound: appSettings.soundEnabled, vibrate: appSettings.vibrateEnabled });
+  }, [appSettings.soundEnabled, appSettings.vibrateEnabled]);
+
 
   const schedule = useMemo(() => buildSchedule(settings), [settings]);
   const current = schedule[idx];
