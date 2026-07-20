@@ -12,4 +12,19 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // Route Nitro's public assets to dist for Capacitor webDir.
+  nitro: {
+    output: {
+      dir: "dist",
+      publicDir: "dist",
+      serverDir: "dist/server",
+    },
+  },
+  vite: {
+    // Relative asset paths for Capacitor (file:// / capacitor:// origins).
+    base: "./",
+    build: {
+      outDir: "dist",
+    },
+  },
 });
