@@ -1,36 +1,33 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
-import { DEFAULT_APP_SETTINGS, useAppSettings } from "@/lib/appSettings";
+import { DEFAULT_APP_SETTINGS, type AppSettings } from "@/lib/appSettings";
 
-export const Route = createFileRoute("/settings")({
-  head: () => ({
-    meta: [
-      { title: "Settings — Workout Timer" },
-      { name: "description", content: "Customize your workout timer's appearance and behavior." },
-    ],
-  }),
-  component: SettingsPage,
-});
-
-function SettingsPage() {
-  const [s, setS] = useAppSettings();
-  const set = <K extends keyof typeof s>(k: K, v: (typeof s)[K]) =>
+export function SettingsPanel({
+  settings: s,
+  setSettings: setS,
+  onClose,
+}: {
+  settings: AppSettings;
+  setSettings: React.Dispatch<React.SetStateAction<AppSettings>>;
+  onClose: () => void;
+}) {
+  const set = <K extends keyof AppSettings>(k: K, v: AppSettings[K]) =>
     setS((prev) => ({ ...prev, [k]: v }));
 
   return (
     <div
-      className="min-h-screen text-white"
+      className="fixed inset-0 z-50 overflow-y-auto text-white"
       style={{ background: `linear-gradient(to bottom, ${s.appBg}dd, ${s.appBg})` }}
     >
       <div className="mx-auto flex min-h-screen w-full max-w-md flex-col px-5 py-6">
         <header className="mb-6 flex items-center gap-3">
-          <Link
-            to="/"
+          <button
+            type="button"
+            onClick={onClose}
             aria-label="Back"
             className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15 hover:bg-white/25"
           >
             <ArrowLeft className="h-5 w-5" />
-          </Link>
+          </button>
           <h1 className="text-2xl font-black tracking-tight">Settings</h1>
         </header>
 
