@@ -139,8 +139,9 @@ function Index() {
       : `${settings.sets} sets · ${settings.timePerSet}s`;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary via-primary to-blue-700 text-primary-foreground">
-      <div className="mx-auto flex min-h-screen w-full max-w-md flex-col px-5 py-6">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-fuchsia-900 text-white">
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top_left,rgba(168,85,247,0.35),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.30),transparent_45%)]" />
+      <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col px-5 py-6">
         <header className="mb-4">
           <h1 className="text-2xl font-black tracking-tight">Workout Timer</h1>
           <p className="text-sm font-semibold opacity-80">Set it up, then hit start.</p>
@@ -148,7 +149,8 @@ function Index() {
 
         {/* Timer display */}
         <div className="relative flex flex-col items-center gap-2 overflow-hidden rounded-[2rem] bg-white/15 px-4 py-8 shadow-2xl ring-1 ring-white/20 backdrop-blur-sm">
-          <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-yellow-300 via-pink-400 to-cyan-300" />
+          <div className="absolute inset-x-0 top-0 h-2 bg-gradient-to-r from-yellow-300 via-pink-400 via-cyan-300 to-lime-300" />
+          <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-lime-300 via-cyan-300 via-pink-400 to-yellow-300 opacity-60" />
           <div className="text-sm font-extrabold uppercase tracking-widest opacity-90">
             {label}
           </div>
