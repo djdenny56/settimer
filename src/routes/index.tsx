@@ -127,6 +127,13 @@ function Index() {
   const seconds = Math.floor(displayRemaining);
   const tenths = Math.floor((displayRemaining - seconds) * 10);
 
+  const currentDuration = current?.duration ?? settings.timePerSet;
+  const progress =
+    currentDuration > 0
+      ? Math.max(0, Math.min(1, displayRemaining / currentDuration))
+      : 1;
+  const timerOffset = TIMER_CIRCUMFERENCE * (1 - progress);
+
   const label = done
     ? "Done"
     : running && current
