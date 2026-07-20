@@ -149,17 +149,53 @@ function Index() {
 
         {/* Timer display */}
         <div className="rounded-[2rem] bg-gradient-to-br from-yellow-300 via-pink-400 to-cyan-300 p-1 shadow-2xl shadow-black/25">
-          <div className="relative flex flex-col items-center gap-2 overflow-hidden rounded-[calc(2rem-4px)] bg-white/15 px-4 py-8 backdrop-blur-sm">
+          <div className="relative flex flex-col items-center gap-3 overflow-hidden rounded-[calc(2rem-4px)] bg-white/15 px-4 py-8 backdrop-blur-sm">
             <div className="absolute inset-x-0 top-0 h-2 bg-gradient-to-r from-yellow-300 via-pink-400 to-cyan-300" />
             <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-cyan-300 via-pink-400 to-yellow-300 opacity-60" />
-            <div className="text-sm font-extrabold uppercase tracking-widest opacity-90">
-              {label}
+
+            <div className="relative flex h-60 w-60 items-center justify-center">
+              <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100">
+                <defs>
+                  <linearGradient id="timerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#fde047" />
+                    <stop offset="50%" stopColor="#f472b6" />
+                    <stop offset="100%" stopColor="#67e8f9" />
+                  </linearGradient>
+                </defs>
+                <circle
+                  cx="50"
+                  cy="50"
+                  r={TIMER_R}
+                  fill="none"
+                  stroke="rgba(255,255,255,0.15)"
+                  strokeWidth="6"
+                />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r={TIMER_R}
+                  fill="none"
+                  stroke="url(#timerGradient)"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                  transform="rotate(-90 50 50)"
+                  strokeDasharray={TIMER_CIRCUMFERENCE}
+                  strokeDashoffset={timerOffset}
+                  className="transition-[stroke-dashoffset] duration-100 ease-linear"
+                />
+              </svg>
+
+              <div className="relative z-10 flex flex-col items-center gap-2">
+                <div className="text-base font-extrabold uppercase tracking-widest opacity-90">
+                  {label}
+                </div>
+                <div className="flex items-baseline font-black tabular-nums leading-none drop-shadow-md">
+                  <span className="text-8xl">{seconds}</span>
+                  <span className="text-3xl opacity-80">.{tenths}</span>
+                </div>
+                <div className="text-base font-bold opacity-85">{subline}</div>
+              </div>
             </div>
-            <div className="flex items-baseline font-black tabular-nums leading-none drop-shadow-md">
-              <span className="text-8xl">{seconds}</span>
-              <span className="text-3xl opacity-80">.{tenths}</span>
-            </div>
-            <div className="text-sm font-bold opacity-85">{subline}</div>
           </div>
         </div>
 
@@ -231,9 +267,9 @@ function Index() {
         </div>
 
         {/* Setup */}
-        <div className="mt-6 flex flex-col gap-3">
+        <div className="mt-6 grid grid-cols-3 gap-3">
           <Field
-            label="Number of sets"
+            label="Sets"
             value={settings.sets}
             onChange={(v) => set("sets", v)}
             min={1}
@@ -241,8 +277,8 @@ function Index() {
             disabled={running}
           />
           <Field
-            label="Time per set"
-            suffix="seconds"
+            label="Time / set"
+            suffix="sec"
             value={settings.timePerSet}
             onChange={(v) => set("timePerSet", v)}
             min={1}
@@ -251,8 +287,8 @@ function Index() {
             disabled={running}
           />
           <Field
-            label="Rest between sets"
-            suffix="seconds"
+            label="Rest"
+            suffix="sec"
             value={settings.restBetweenSets}
             onChange={(v) => set("restBetweenSets", v)}
             min={0}
@@ -260,19 +296,16 @@ function Index() {
             step={5}
             disabled={running}
           />
+        </div>
 
+        <div className="mt-3 grid grid-cols-2 gap-3">
           <div
             className={`rounded-2xl bg-gradient-to-br from-yellow-300/80 via-pink-400/80 to-cyan-300/80 p-[1px] ${
               running ? "opacity-60" : ""
             }`}
           >
-            <label className="flex items-center justify-between gap-4 rounded-[calc(1rem-1px)] bg-white/15 p-4 backdrop-blur-sm">
-              <div className="flex flex-col">
-                <span className="text-sm font-bold">Double set</span>
-                <span className="text-xs font-semibold opacity-80">
-                  e.g. left arm, then right arm
-                </span>
-              </div>
+            <label className="flex flex-col items-center gap-2 rounded-[calc(1rem-1px)] bg-white/15 p-3 backdrop-blur-sm">
+              <span className="text-center text-xs font-bold">Double set</span>
               <input
                 type="checkbox"
                 disabled={running}
@@ -285,12 +318,13 @@ function Index() {
 
           {settings.doubleSet && (
             <Field
-              label="Rest between sides"
-              suffix="seconds"
+              label="Switch rest"
+              suffix="sec"
               value={settings.restBetweenSides}
               onChange={(v) => set("restBetweenSides", v)}
               min={0}
               max={600}
+              step={5}
               disabled={running}
             />
           )}
@@ -299,6 +333,9 @@ function Index() {
     </div>
   );
 }
+
+const TIMER_R = 46;
+const TIMER_CIRCUMFERENCE = 2 * Math.PI * TIMER_R;
 
 function Field({
   label,
@@ -326,21 +363,18 @@ function Field({
         disabled ? "opacity-60" : ""
       }`}
     >
-      <div className="flex items-center justify-between gap-4 rounded-[calc(1rem-1px)] bg-white/15 p-4 backdrop-blur-sm">
-        <div className="flex flex-col">
-          <span className="text-sm font-bold">{label}</span>
-          {suffix && <span className="text-xs font-semibold opacity-80">{suffix}</span>}
-        </div>
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col items-center gap-2 rounded-[calc(1rem-1px)] bg-white/15 p-3 backdrop-blur-sm">
+        <span className="text-center text-xs font-bold leading-tight">{label}</span>
+        <div className="flex items-center gap-1">
           <button
             type="button"
             disabled={disabled}
             aria-label={`Decrease ${label}`}
             onClick={() => onChange(clamp(value - step))}
-            className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 via-pink-400 to-cyan-300 p-0.5 shadow-md transition-transform hover:scale-105 active:scale-95 disabled:opacity-50"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 via-pink-400 to-cyan-300 p-0.5 shadow-md transition-transform hover:scale-105 active:scale-95 disabled:opacity-50"
           >
             <span className="flex h-full w-full items-center justify-center rounded-full bg-white">
-              <Minus className="h-5 w-5 stroke-[3] text-primary" />
+              <Minus className="h-4 w-4 stroke-[3] text-primary" />
             </span>
           </button>
           <input
@@ -355,20 +389,21 @@ function Field({
               const n = Number(e.target.value);
               if (Number.isFinite(n)) onChange(clamp(n));
             }}
-            className="w-16 rounded-xl bg-white/95 px-2 py-2 text-center text-lg font-extrabold tabular-nums text-primary outline-none focus:ring-2 focus:ring-white disabled:opacity-70"
+            className="w-12 rounded-xl bg-white/95 px-1 py-1.5 text-center text-base font-extrabold tabular-nums text-primary outline-none focus:ring-2 focus:ring-white disabled:opacity-70"
           />
           <button
             type="button"
             disabled={disabled}
             aria-label={`Increase ${label}`}
             onClick={() => onChange(clamp(value + step))}
-            className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-cyan-300 via-pink-400 to-yellow-300 p-0.5 shadow-md transition-transform hover:scale-105 active:scale-95 disabled:opacity-50"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-cyan-300 via-pink-400 to-yellow-300 p-0.5 shadow-md transition-transform hover:scale-105 active:scale-95 disabled:opacity-50"
           >
             <span className="flex h-full w-full items-center justify-center rounded-full bg-white">
-              <Plus className="h-5 w-5 stroke-[3] text-primary" />
+              <Plus className="h-4 w-4 stroke-[3] text-primary" />
             </span>
           </button>
         </div>
+        {suffix && <span className="text-[10px] font-semibold opacity-70">{suffix}</span>}
       </div>
     </div>
   );
