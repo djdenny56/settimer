@@ -261,25 +261,27 @@ function Index() {
             disabled={running}
           />
 
-          <label
-            className={`flex items-center justify-between gap-4 rounded-2xl bg-white/15 p-4 ring-1 ring-white/10 ${
+          <div
+            className={`rounded-2xl bg-gradient-to-br from-yellow-300/80 via-pink-400/80 via-cyan-300/80 to-lime-300/80 p-[1px] ${
               running ? "opacity-60" : ""
             }`}
           >
-            <div className="flex flex-col">
-              <span className="text-sm font-bold">Double set</span>
-              <span className="text-xs font-semibold opacity-80">
-                e.g. left arm, then right arm
-              </span>
-            </div>
-            <input
-              type="checkbox"
-              disabled={running}
-              className="relative h-6 w-11 cursor-pointer appearance-none rounded-full bg-black/30 transition-colors before:absolute before:left-0.5 before:top-0.5 before:h-5 before:w-5 before:rounded-full before:bg-white before:transition-transform before:shadow-sm checked:bg-white checked:before:translate-x-5"
-              checked={settings.doubleSet}
-              onChange={(e) => set("doubleSet", e.target.checked)}
-            />
-          </label>
+            <label className="flex items-center justify-between gap-4 rounded-[calc(1rem-1px)] bg-white/15 p-4 backdrop-blur-sm">
+              <div className="flex flex-col">
+                <span className="text-sm font-bold">Double set</span>
+                <span className="text-xs font-semibold opacity-80">
+                  e.g. left arm, then right arm
+                </span>
+              </div>
+              <input
+                type="checkbox"
+                disabled={running}
+                className="relative h-6 w-11 cursor-pointer appearance-none rounded-full bg-gradient-to-r from-yellow-300 via-pink-400 to-cyan-300 transition-colors before:absolute before:left-0.5 before:top-0.5 before:h-5 before:w-5 before:rounded-full before:bg-white before:transition-transform before:shadow-sm checked:from-cyan-300 checked:via-pink-400 checked:to-yellow-300 checked:before:translate-x-5"
+                checked={settings.doubleSet}
+                onChange={(e) => set("doubleSet", e.target.checked)}
+              />
+            </label>
+          </div>
 
           {settings.doubleSet && (
             <Field
