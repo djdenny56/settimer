@@ -303,11 +303,11 @@ function Index() {
 
         <div className="mt-3 grid grid-cols-1 gap-3">
           <div
-            className={`rounded-2xl bg-gradient-to-br from-yellow-300/80 via-pink-400/80 to-cyan-300/80 p-[1px] ${
+            className={`rounded-2xl bg-[#2a1a4a] ${
               running ? "opacity-60" : ""
             }`}
           >
-            <label className="flex flex-row items-center justify-between gap-3 rounded-[calc(1rem-1px)] bg-white/15 px-4 py-2 backdrop-blur-sm">
+            <label className="flex flex-row items-center justify-between gap-3 px-4 py-2">
               <span className="text-sm font-bold">Double set</span>
               <input
                 type="checkbox"
