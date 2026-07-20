@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Minus, Pause, Play, Plus, RotateCcw, Settings as SettingsIcon, SkipForward, Star, X } from "lucide-react";
 import {
@@ -10,6 +10,7 @@ import {
 import { playCue, setCueOptions, unlockAudio } from "@/lib/timer/cues";
 import { useCountdown } from "@/hooks/useCountdown";
 import { useAppSettings } from "@/lib/appSettings";
+import { SettingsPanel } from "@/components/SettingsPanel";
 
 const STORAGE_KEY = "workout-timer-settings";
 const FAVORITES_KEY = "workout-timer-favorites";
@@ -38,7 +39,8 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
-  const [appSettings] = useAppSettings();
+  const [appSettings, setAppSettings] = useAppSettings();
+  const [showSettings, setShowSettings] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [dragId, setDragId] = useState<string | null>(null);
@@ -226,14 +228,23 @@ function Index() {
             <h1 className="text-2xl font-black tracking-tight">{appSettings.title}</h1>
             <p className="text-sm font-semibold opacity-80">Set it up, then hit start.</p>
           </div>
-          <Link
-            to="/settings"
+          <button
+            type="button"
+            onClick={() => setShowSettings(true)}
             aria-label="Settings"
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15 hover:bg-white/25"
           >
             <SettingsIcon className="h-5 w-5" />
-          </Link>
+          </button>
         </header>
+
+        {showSettings && (
+          <SettingsPanel
+            settings={appSettings}
+            setSettings={setAppSettings}
+            onClose={() => setShowSettings(false)}
+          />
+        )}
 
         {/* Timer display */}
         <div className="rounded-[2rem] bg-gradient-to-br from-yellow-300 via-pink-400 to-cyan-300 p-1 shadow-2xl shadow-black/25">
