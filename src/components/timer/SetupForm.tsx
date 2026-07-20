@@ -25,34 +25,20 @@ export function SetupForm({ settings, onChange, onStart }: Props) {
 
       <div className="flex flex-col gap-3">
         <NumberField
-          label="Reps per set"
-          value={settings.reps}
-          onChange={(v) => set("reps", v)}
-          min={1}
-          max={999}
-        />
-        <NumberField
-          label="Time per rep"
-          suffix="seconds"
-          value={settings.timePerRep}
-          onChange={(v) => set("timePerRep", v)}
-          min={1}
-          max={600}
-        />
-        <NumberField
-          label="Rest between reps"
-          suffix="seconds"
-          value={settings.restBetweenReps}
-          onChange={(v) => set("restBetweenReps", v)}
-          min={0}
-          max={600}
-        />
-        <NumberField
           label="Number of sets"
           value={settings.sets}
           onChange={(v) => set("sets", v)}
           min={1}
           max={99}
+        />
+        <NumberField
+          label="Time per set"
+          suffix="seconds"
+          value={settings.timePerSet}
+          onChange={(v) => set("timePerSet", v)}
+          min={1}
+          max={3600}
+          step={5}
         />
         <NumberField
           label="Rest between sets"
@@ -61,6 +47,7 @@ export function SetupForm({ settings, onChange, onStart }: Props) {
           onChange={(v) => set("restBetweenSets", v)}
           min={0}
           max={3600}
+          step={5}
         />
 
         <label className="flex items-center justify-between gap-4 rounded-xl border border-border bg-card p-4">
