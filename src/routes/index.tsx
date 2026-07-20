@@ -146,7 +146,7 @@ function Index() {
       : `${settings.sets} sets · ${settings.timePerSet}s`;
 
   return (
-    <div className="min-h-screen bg-[#1a2045] text-white">
+    <div className="min-h-screen bg-gradient-to-b from-[#C65D34] to-[#8B3A1F] text-white">
       <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col px-5 py-6">
         <header className="mb-4">
           <h1 className="text-2xl font-black tracking-tight">Workout Timer</h1>
