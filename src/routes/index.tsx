@@ -166,7 +166,7 @@ function Index() {
         {/* Controls */}
         <div className="mt-5 flex items-center justify-center gap-3">
           {!running && !done && (
-            <div className="flex-1 rounded-full bg-gradient-to-r from-yellow-300 via-pink-400 via-cyan-300 to-lime-300 p-1 shadow-xl shadow-black/25">
+            <div className="flex-1 rounded-full bg-gradient-to-r from-yellow-300 via-pink-400 to-cyan-300 p-1 shadow-xl shadow-black/25">
               <button
                 onClick={start}
                 className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-white px-8 text-lg font-extrabold text-primary transition-transform active:scale-[0.98]"
@@ -187,7 +187,7 @@ function Index() {
                   <RotateCcw className="h-5 w-5" />
                 </span>
               </button>
-              <div className="flex-1 rounded-full bg-gradient-to-r from-yellow-300 via-pink-400 via-cyan-300 to-lime-300 p-1 shadow-xl shadow-black/25">
+              <div className="flex-1 rounded-full bg-gradient-to-r from-yellow-300 via-pink-400 to-cyan-300 p-1 shadow-xl shadow-black/25">
                 <button
                   onClick={() => setPaused((p) => !p)}
                   aria-label={paused ? "Resume" : "Pause"}
@@ -218,7 +218,7 @@ function Index() {
             </>
           )}
           {done && (
-            <div className="flex-1 rounded-full bg-gradient-to-r from-yellow-300 via-pink-400 via-cyan-300 to-lime-300 p-1 shadow-xl shadow-black/25">
+            <div className="flex-1 rounded-full bg-gradient-to-r from-yellow-300 via-pink-400 to-cyan-300 p-1 shadow-xl shadow-black/25">
               <button
                 onClick={stop}
                 className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-white px-8 text-lg font-extrabold text-primary transition-transform active:scale-[0.98]"
