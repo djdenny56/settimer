@@ -146,8 +146,7 @@ function Index() {
       : `${settings.sets} sets · ${settings.timePerSet}s`;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-fuchsia-900 text-white">
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top_left,rgba(168,85,247,0.35),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.30),transparent_45%)]" />
+    <div className="min-h-screen bg-[#1a2045] text-white">
       <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col px-5 py-6">
         <header className="mb-4">
           <h1 className="text-2xl font-black tracking-tight">Workout Timer</h1>
