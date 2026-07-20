@@ -155,10 +155,7 @@ function Index() {
 
         {/* Timer display */}
         <div className="rounded-[2rem] bg-gradient-to-br from-yellow-300 via-pink-400 to-cyan-300 p-1 shadow-2xl shadow-black/25">
-          <div className="relative flex flex-col items-center gap-3 overflow-hidden rounded-[calc(2rem-4px)] bg-white/15 px-4 py-8 backdrop-blur-sm">
-            <div className="absolute inset-x-0 top-0 h-2 bg-gradient-to-r from-yellow-300 via-pink-400 to-cyan-300" />
-            <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-cyan-300 via-pink-400 to-yellow-300 opacity-60" />
-
+          <div className="relative flex flex-col items-center gap-3 overflow-hidden rounded-[calc(2rem-4px)] bg-[#2a1a4a] px-4 py-8">
             <div className="relative flex h-60 w-60 items-center justify-center">
               <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100">
                 <defs>
@@ -225,7 +222,7 @@ function Index() {
                 aria-label="Stop"
                 className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 via-pink-400 to-cyan-300 p-0.5 transition-transform active:scale-[0.96]"
               >
-                <span className="flex h-full w-full items-center justify-center rounded-full bg-black/30 text-white transition-colors hover:bg-black/40">
+                <span className="flex h-full w-full items-center justify-center rounded-full bg-[#2a1a4a] text-white transition-colors hover:bg-[#362260]">
                   <RotateCcw className="h-5 w-5" />
                 </span>
               </button>
@@ -253,7 +250,7 @@ function Index() {
                 aria-label="Skip"
                 className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-cyan-300 via-pink-400 to-yellow-300 p-0.5 transition-transform active:scale-[0.96]"
               >
-                <span className="flex h-full w-full items-center justify-center rounded-full bg-black/30 text-white transition-colors hover:bg-black/40">
+                <span className="flex h-full w-full items-center justify-center rounded-full bg-[#2a1a4a] text-white transition-colors hover:bg-[#362260]">
                   <SkipForward className="h-5 w-5" />
                 </span>
               </button>
@@ -306,11 +303,11 @@ function Index() {
 
         <div className="mt-3 grid grid-cols-1 gap-3">
           <div
-            className={`rounded-2xl bg-gradient-to-br from-yellow-300/80 via-pink-400/80 to-cyan-300/80 p-[1px] ${
+            className={`rounded-2xl bg-[#2a1a4a] ${
               running ? "opacity-60" : ""
             }`}
           >
-            <label className="flex flex-row items-center justify-between gap-3 rounded-[calc(1rem-1px)] bg-white/15 px-4 py-2 backdrop-blur-sm">
+            <label className="flex flex-row items-center justify-between gap-3 px-4 py-2">
               <span className="text-sm font-bold">Double set</span>
               <input
                 type="checkbox"
@@ -365,11 +362,11 @@ function Field({
   const clamp = (n: number) => Math.max(min, Math.min(max, n));
   return (
     <div
-      className={`rounded-2xl bg-gradient-to-br from-yellow-300/80 via-pink-400/80 to-cyan-300/80 p-[1px] ${
+      className={`rounded-2xl bg-[#2a1a4a] p-3 ${
         disabled ? "opacity-60" : ""
       }`}
     >
-      <div className="flex flex-col items-center gap-2 rounded-[calc(1rem-1px)] bg-white/15 p-3 backdrop-blur-sm">
+      <div className="flex flex-col items-center gap-2">
         <span className="text-center text-xs font-bold leading-tight">{label}</span>
         <input
           type="number"
