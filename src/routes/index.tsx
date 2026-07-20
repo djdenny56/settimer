@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Minus, Pause, Play, Plus, RotateCcw, SkipForward, Star, X } from "lucide-react";
+import { Minus, Pause, Play, Plus, RotateCcw, Settings as SettingsIcon, SkipForward, Star, X } from "lucide-react";
 import {
   buildSchedule,
   DEFAULT_SETTINGS,
@@ -9,6 +9,7 @@ import {
 } from "@/lib/timer/schedule";
 import { playCue, unlockAudio } from "@/lib/timer/cues";
 import { useCountdown } from "@/hooks/useCountdown";
+import { useAppSettings } from "@/lib/appSettings";
 
 const STORAGE_KEY = "workout-timer-settings";
 const FAVORITES_KEY = "workout-timer-favorites";
@@ -37,6 +38,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
+  const [appSettings] = useAppSettings();
   const [loaded, setLoaded] = useState(false);
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [running, setRunning] = useState(false);
@@ -195,11 +197,23 @@ function Index() {
       : `${settings.sets} sets · ${settings.timePerSet}s`;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#C65D34] to-[#8B3A1F] text-white">
+    <div
+      className="min-h-screen text-white"
+      style={{ background: `linear-gradient(to bottom, ${appSettings.appBg}dd, ${appSettings.appBg})` }}
+    >
       <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col px-5 py-6">
-        <header className="mb-4">
-          <h1 className="text-2xl font-black tracking-tight">Workout Timer</h1>
-          <p className="text-sm font-semibold opacity-80">Set it up, then hit start.</p>
+        <header className="mb-4 flex items-start justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-black tracking-tight">{appSettings.title}</h1>
+            <p className="text-sm font-semibold opacity-80">Set it up, then hit start.</p>
+          </div>
+          <Link
+            to="/settings"
+            aria-label="Settings"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15 hover:bg-white/25"
+          >
+            <SettingsIcon className="h-5 w-5" />
+          </Link>
         </header>
 
         {/* Timer display */}
