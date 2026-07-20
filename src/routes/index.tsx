@@ -166,57 +166,67 @@ function Index() {
         {/* Controls */}
         <div className="mt-5 flex items-center justify-center gap-3">
           {!running && !done && (
-            <button
-              onClick={start}
-              className="flex h-16 flex-1 items-center justify-center gap-2 rounded-full bg-white px-8 text-lg font-extrabold text-primary shadow-xl shadow-black/20 transition-transform active:scale-[0.98]"
-            >
-              <Play className="h-5 w-5 fill-current" />
-              Start
-            </button>
+            <div className="flex-1 rounded-full bg-gradient-to-r from-yellow-300 via-pink-400 via-cyan-300 to-lime-300 p-1 shadow-xl shadow-black/25">
+              <button
+                onClick={start}
+                className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-white px-8 text-lg font-extrabold text-primary transition-transform active:scale-[0.98]"
+              >
+                <Play className="h-5 w-5 fill-current" />
+                Start
+              </button>
+            </div>
           )}
           {running && (
             <>
               <button
                 onClick={stop}
                 aria-label="Stop"
-                className="flex h-14 w-14 items-center justify-center rounded-full bg-black/20 text-white ring-1 ring-white/20 transition-colors hover:bg-black/30"
+                className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 via-pink-400 to-cyan-300 p-0.5 transition-transform active:scale-[0.96]"
               >
-                <RotateCcw className="h-5 w-5" />
+                <span className="flex h-full w-full items-center justify-center rounded-full bg-black/30 text-white transition-colors hover:bg-black/40">
+                  <RotateCcw className="h-5 w-5" />
+                </span>
               </button>
-              <button
-                onClick={() => setPaused((p) => !p)}
-                aria-label={paused ? "Resume" : "Pause"}
-                className="flex h-16 flex-1 items-center justify-center gap-2 rounded-full bg-white px-8 text-lg font-extrabold text-primary shadow-xl shadow-black/20 transition-transform active:scale-[0.98]"
-              >
-                {paused ? (
-                  <>
-                    <Play className="h-5 w-5 fill-current" />
-                    Resume
-                  </>
-                ) : (
-                  <>
-                    <Pause className="h-5 w-5" />
-                    Pause
-                  </>
-                )}
-              </button>
+              <div className="flex-1 rounded-full bg-gradient-to-r from-yellow-300 via-pink-400 via-cyan-300 to-lime-300 p-1 shadow-xl shadow-black/25">
+                <button
+                  onClick={() => setPaused((p) => !p)}
+                  aria-label={paused ? "Resume" : "Pause"}
+                  className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-white px-8 text-lg font-extrabold text-primary transition-transform active:scale-[0.98]"
+                >
+                  {paused ? (
+                    <>
+                      <Play className="h-5 w-5 fill-current" />
+                      Resume
+                    </>
+                  ) : (
+                    <>
+                      <Pause className="h-5 w-5" />
+                      Pause
+                    </>
+                  )}
+                </button>
+              </div>
               <button
                 onClick={advance}
                 aria-label="Skip"
-                className="flex h-14 w-14 items-center justify-center rounded-full bg-black/20 text-white ring-1 ring-white/20 transition-colors hover:bg-black/30"
+                className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-cyan-300 via-pink-400 to-yellow-300 p-0.5 transition-transform active:scale-[0.96]"
               >
-                <SkipForward className="h-5 w-5" />
+                <span className="flex h-full w-full items-center justify-center rounded-full bg-black/30 text-white transition-colors hover:bg-black/40">
+                  <SkipForward className="h-5 w-5" />
+                </span>
               </button>
             </>
           )}
           {done && (
-            <button
-              onClick={stop}
-              className="flex h-16 flex-1 items-center justify-center gap-2 rounded-full bg-white px-8 text-lg font-extrabold text-primary shadow-xl shadow-black/20 transition-transform active:scale-[0.98]"
-            >
-              <RotateCcw className="h-5 w-5" />
-              Reset
-            </button>
+            <div className="flex-1 rounded-full bg-gradient-to-r from-yellow-300 via-pink-400 via-cyan-300 to-lime-300 p-1 shadow-xl shadow-black/25">
+              <button
+                onClick={stop}
+                className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-white px-8 text-lg font-extrabold text-primary transition-transform active:scale-[0.98]"
+              >
+                <RotateCcw className="h-5 w-5" />
+                Reset
+              </button>
+            </div>
           )}
         </div>
 
