@@ -38,6 +38,7 @@ export const Route = createFileRoute("/")({
 function Index() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [loaded, setLoaded] = useState(false);
+  const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [running, setRunning] = useState(false);
   const [paused, setPaused] = useState(false);
   const [idx, setIdx] = useState(0);
@@ -48,6 +49,15 @@ function Index() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) setSettings({ ...DEFAULT_SETTINGS, ...JSON.parse(raw) });
+    } catch {
+      // ignore
+    }
+    try {
+      const raw = localStorage.getItem(FAVORITES_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) setFavorites(parsed);
+      }
     } catch {
       // ignore
     }
@@ -62,6 +72,16 @@ function Index() {
       // ignore
     }
   }, [settings, loaded]);
+
+  useEffect(() => {
+    if (!loaded) return;
+    try {
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+    } catch {
+      // ignore
+    }
+  }, [favorites, loaded]);
+
 
   const schedule = useMemo(() => buildSchedule(settings), [settings]);
   const current = schedule[idx];
