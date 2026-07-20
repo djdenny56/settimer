@@ -372,41 +372,41 @@ function Field({
     >
       <div className="flex flex-col items-center gap-2 rounded-[calc(1rem-1px)] bg-white/15 p-3 backdrop-blur-sm">
         <span className="text-center text-xs font-bold leading-tight">{label}</span>
-        <div className="flex items-center gap-1">
+        <input
+          type="number"
+          inputMode="numeric"
+          value={value}
+          min={min}
+          max={max}
+          step={step}
+          disabled={disabled}
+          onChange={(e) => {
+            const n = Number(e.target.value);
+            if (Number.isFinite(n)) onChange(clamp(n));
+          }}
+          className="w-full rounded-xl bg-white/95 px-1 py-1 text-center text-2xl font-extrabold tabular-nums text-primary outline-none focus:ring-2 focus:ring-white disabled:opacity-70"
+        />
+        <div className="flex items-center gap-2">
           <button
             type="button"
             disabled={disabled}
             aria-label={`Decrease ${label}`}
             onClick={() => onChange(clamp(value - step))}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 via-pink-400 to-cyan-300 p-0.5 shadow-md transition-transform hover:scale-105 active:scale-95 disabled:opacity-50"
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 via-pink-400 to-cyan-300 p-0.5 shadow-md transition-transform hover:scale-105 active:scale-95 disabled:opacity-50"
           >
             <span className="flex h-full w-full items-center justify-center rounded-full bg-white">
-              <Minus className="h-4 w-4 stroke-[3] text-primary" />
+              <Minus className="h-5 w-5 stroke-[3] text-primary" />
             </span>
           </button>
-          <input
-            type="number"
-            inputMode="numeric"
-            value={value}
-            min={min}
-            max={max}
-            step={step}
-            disabled={disabled}
-            onChange={(e) => {
-              const n = Number(e.target.value);
-              if (Number.isFinite(n)) onChange(clamp(n));
-            }}
-            className="w-12 rounded-xl bg-white/95 px-1 py-1.5 text-center text-base font-extrabold tabular-nums text-primary outline-none focus:ring-2 focus:ring-white disabled:opacity-70"
-          />
           <button
             type="button"
             disabled={disabled}
             aria-label={`Increase ${label}`}
             onClick={() => onChange(clamp(value + step))}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-cyan-300 via-pink-400 to-yellow-300 p-0.5 shadow-md transition-transform hover:scale-105 active:scale-95 disabled:opacity-50"
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-cyan-300 via-pink-400 to-yellow-300 p-0.5 shadow-md transition-transform hover:scale-105 active:scale-95 disabled:opacity-50"
           >
             <span className="flex h-full w-full items-center justify-center rounded-full bg-white">
-              <Plus className="h-4 w-4 stroke-[3] text-primary" />
+              <Plus className="h-5 w-5 stroke-[3] text-primary" />
             </span>
           </button>
         </div>
