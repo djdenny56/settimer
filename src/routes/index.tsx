@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Minus, Pause, Play, Plus, RotateCcw, SkipForward } from "lucide-react";
+import { Minus, Pause, Play, Plus, RotateCcw, SkipForward, Star, X } from "lucide-react";
 import {
   buildSchedule,
   DEFAULT_SETTINGS,
@@ -11,6 +11,10 @@ import { playCue, unlockAudio } from "@/lib/timer/cues";
 import { useCountdown } from "@/hooks/useCountdown";
 
 const STORAGE_KEY = "workout-timer-settings";
+const FAVORITES_KEY = "workout-timer-favorites";
+
+type Favorite = { id: string; name: string; settings: Settings };
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
