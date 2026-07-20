@@ -222,7 +222,7 @@ function Index() {
                 aria-label="Stop"
                 className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 via-pink-400 to-cyan-300 p-0.5 transition-transform active:scale-[0.96]"
               >
-                <span className="flex h-full w-full items-center justify-center rounded-full bg-black/30 text-white transition-colors hover:bg-black/40">
+                <span className="flex h-full w-full items-center justify-center rounded-full bg-[#2a1a4a] text-white transition-colors hover:bg-[#362260]">
                   <RotateCcw className="h-5 w-5" />
                 </span>
               </button>
