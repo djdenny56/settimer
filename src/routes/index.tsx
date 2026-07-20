@@ -148,17 +148,19 @@ function Index() {
         </header>
 
         {/* Timer display */}
-        <div className="relative flex flex-col items-center gap-2 overflow-hidden rounded-[2rem] bg-white/15 px-4 py-8 shadow-2xl ring-1 ring-white/20 backdrop-blur-sm">
-          <div className="absolute inset-x-0 top-0 h-2 bg-gradient-to-r from-yellow-300 via-pink-400 via-cyan-300 to-lime-300" />
-          <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-lime-300 via-cyan-300 via-pink-400 to-yellow-300 opacity-60" />
-          <div className="text-sm font-extrabold uppercase tracking-widest opacity-90">
-            {label}
+        <div className="rounded-[2rem] bg-gradient-to-br from-yellow-300 via-pink-400 via-cyan-300 to-lime-300 p-1 shadow-2xl shadow-black/25">
+          <div className="relative flex flex-col items-center gap-2 overflow-hidden rounded-[calc(2rem-4px)] bg-white/15 px-4 py-8 backdrop-blur-sm">
+            <div className="absolute inset-x-0 top-0 h-2 bg-gradient-to-r from-yellow-300 via-pink-400 via-cyan-300 to-lime-300" />
+            <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-lime-300 via-cyan-300 via-pink-400 to-yellow-300 opacity-60" />
+            <div className="text-sm font-extrabold uppercase tracking-widest opacity-90">
+              {label}
+            </div>
+            <div className="flex items-baseline font-black tabular-nums leading-none drop-shadow-md">
+              <span className="text-8xl">{seconds}</span>
+              <span className="text-3xl opacity-80">.{tenths}</span>
+            </div>
+            <div className="text-sm font-bold opacity-85">{subline}</div>
           </div>
-          <div className="flex items-baseline font-black tabular-nums leading-none drop-shadow-md">
-            <span className="text-8xl">{seconds}</span>
-            <span className="text-3xl opacity-80">.{tenths}</span>
-          </div>
-          <div className="text-sm font-bold opacity-85">{subline}</div>
         </div>
 
         {/* Controls */}
