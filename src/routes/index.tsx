@@ -305,18 +305,18 @@ function Index() {
           />
         </div>
 
-        <div className="mt-3 grid grid-cols-2 gap-3">
+        <div className="mt-3 grid grid-cols-1 gap-3">
           <div
             className={`rounded-2xl bg-gradient-to-br from-yellow-300/80 via-pink-400/80 to-cyan-300/80 p-[1px] ${
               running ? "opacity-60" : ""
             }`}
           >
-            <label className="flex flex-col items-center gap-2 rounded-[calc(1rem-1px)] bg-white/15 p-3 backdrop-blur-sm">
-              <span className="text-center text-xs font-bold">Double set</span>
+            <label className="flex flex-row items-center justify-between gap-3 rounded-[calc(1rem-1px)] bg-white/15 px-4 py-2 backdrop-blur-sm">
+              <span className="text-sm font-bold">Double set</span>
               <input
                 type="checkbox"
                 disabled={running}
-                className="relative h-6 w-11 cursor-pointer appearance-none rounded-full bg-gradient-to-r from-yellow-300 via-pink-400 to-cyan-300 transition-colors before:absolute before:left-0.5 before:top-0.5 before:h-5 before:w-5 before:rounded-full before:bg-white before:transition-transform before:shadow-sm checked:from-cyan-300 checked:via-pink-400 checked:to-yellow-300 checked:before:translate-x-5"
+                className="relative h-6 w-11 shrink-0 cursor-pointer appearance-none rounded-full bg-gradient-to-r from-yellow-300 via-pink-400 to-cyan-300 transition-colors before:absolute before:left-0.5 before:top-0.5 before:h-5 before:w-5 before:rounded-full before:bg-white before:transition-transform before:shadow-sm checked:from-cyan-300 checked:via-pink-400 checked:to-yellow-300 checked:before:translate-x-5"
                 checked={settings.doubleSet}
                 onChange={(e) => set("doubleSet", e.target.checked)}
               />
