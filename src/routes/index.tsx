@@ -341,6 +341,7 @@ function Index() {
             min={1}
             max={99}
             disabled={running}
+            tileBg={appSettings.tileBg}
           />
           <Field
             label="Time / set"
@@ -351,6 +352,7 @@ function Index() {
             max={3600}
             step={5}
             disabled={running}
+            tileBg={appSettings.tileBg}
           />
           <Field
             label="Rest"
@@ -361,6 +363,7 @@ function Index() {
             max={3600}
             step={5}
             disabled={running}
+            tileBg={appSettings.tileBg}
           />
         </div>
 
@@ -479,6 +482,7 @@ function Field({
   step = 1,
   suffix,
   disabled,
+  tileBg,
 }: {
   label: string;
   value: number;
@@ -488,13 +492,13 @@ function Field({
   step?: number;
   suffix?: string;
   disabled?: boolean;
+  tileBg?: string;
 }) {
   const clamp = (n: number) => Math.max(min, Math.min(max, n));
   return (
     <div
-      className={`rounded-2xl bg-[#2a1a4a] p-3 ${
-        disabled ? "opacity-60" : ""
-      }`}
+      className={`rounded-2xl p-3 ${disabled ? "opacity-60" : ""}`}
+      style={{ background: tileBg ?? "#2a1a4a" }}
     >
       <div className="flex flex-col items-center gap-2">
         <span className="text-center text-xs font-bold leading-tight">{label}</span>
