@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Minus, Pause, Play, Plus, RotateCcw, SkipForward, Star, X } from "lucide-react";
+import { Minus, Pause, Play, Plus, RotateCcw, Settings as SettingsIcon, SkipForward, Star, X } from "lucide-react";
 import {
   buildSchedule,
   DEFAULT_SETTINGS,
@@ -9,6 +9,7 @@ import {
 } from "@/lib/timer/schedule";
 import { playCue, unlockAudio } from "@/lib/timer/cues";
 import { useCountdown } from "@/hooks/useCountdown";
+import { useAppSettings } from "@/lib/appSettings";
 
 const STORAGE_KEY = "workout-timer-settings";
 const FAVORITES_KEY = "workout-timer-favorites";
@@ -37,6 +38,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
+  const [appSettings] = useAppSettings();
   const [loaded, setLoaded] = useState(false);
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [running, setRunning] = useState(false);
@@ -195,16 +197,28 @@ function Index() {
       : `${settings.sets} sets · ${settings.timePerSet}s`;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#C65D34] to-[#8B3A1F] text-white">
+    <div
+      className="min-h-screen text-white"
+      style={{ background: `linear-gradient(to bottom, ${appSettings.appBg}dd, ${appSettings.appBg})` }}
+    >
       <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col px-5 py-6">
-        <header className="mb-4">
-          <h1 className="text-2xl font-black tracking-tight">Workout Timer</h1>
-          <p className="text-sm font-semibold opacity-80">Set it up, then hit start.</p>
+        <header className="mb-4 flex items-start justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-black tracking-tight">{appSettings.title}</h1>
+            <p className="text-sm font-semibold opacity-80">Set it up, then hit start.</p>
+          </div>
+          <Link
+            to="/settings"
+            aria-label="Settings"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15 hover:bg-white/25"
+          >
+            <SettingsIcon className="h-5 w-5" />
+          </Link>
         </header>
 
         {/* Timer display */}
         <div className="rounded-[2rem] bg-gradient-to-br from-yellow-300 via-pink-400 to-cyan-300 p-1 shadow-2xl shadow-black/25">
-          <div className="relative flex flex-col items-center gap-3 overflow-hidden rounded-[calc(2rem-4px)] bg-[#2a1a4a] px-4 py-8">
+          <div className="relative flex flex-col items-center gap-3 overflow-hidden rounded-[calc(2rem-4px)] px-4 py-8" style={{ background: appSettings.tileBg }}>
             <div className="relative flex h-60 w-60 items-center justify-center">
               <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100">
                 <defs>
@@ -243,7 +257,7 @@ function Index() {
                 </div>
                 <div className="flex items-baseline font-black tabular-nums leading-none drop-shadow-md">
                   <span className="text-8xl">{seconds}</span>
-                  <span className="text-3xl opacity-80">.{tenths}</span>
+                  {appSettings.showMs && <span className="text-3xl opacity-80">.{tenths}</span>}
                 </div>
                 <div className="text-base font-bold opacity-85">{subline}</div>
               </div>
@@ -271,7 +285,7 @@ function Index() {
                 aria-label="Stop"
                 className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 via-pink-400 to-cyan-300 p-0.5 transition-transform active:scale-[0.96]"
               >
-                <span className="flex h-full w-full items-center justify-center rounded-full bg-[#2a1a4a] text-white transition-colors hover:bg-[#362260]">
+                <span className="flex h-full w-full items-center justify-center rounded-full text-white transition-opacity hover:opacity-90" style={{ background: appSettings.tileBg }}>
                   <RotateCcw className="h-5 w-5" />
                 </span>
               </button>
@@ -299,7 +313,7 @@ function Index() {
                 aria-label="Skip"
                 className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-cyan-300 via-pink-400 to-yellow-300 p-0.5 transition-transform active:scale-[0.96]"
               >
-                <span className="flex h-full w-full items-center justify-center rounded-full bg-[#2a1a4a] text-white transition-colors hover:bg-[#362260]">
+                <span className="flex h-full w-full items-center justify-center rounded-full text-white transition-opacity hover:opacity-90" style={{ background: appSettings.tileBg }}>
                   <SkipForward className="h-5 w-5" />
                 </span>
               </button>
@@ -327,6 +341,7 @@ function Index() {
             min={1}
             max={99}
             disabled={running}
+            tileBg={appSettings.tileBg}
           />
           <Field
             label="Time / set"
@@ -337,6 +352,7 @@ function Index() {
             max={3600}
             step={5}
             disabled={running}
+            tileBg={appSettings.tileBg}
           />
           <Field
             label="Rest"
@@ -347,14 +363,14 @@ function Index() {
             max={3600}
             step={5}
             disabled={running}
+            tileBg={appSettings.tileBg}
           />
         </div>
 
         <div className="mt-3 grid grid-cols-1 gap-3">
           <div
-            className={`rounded-2xl bg-[#2a1a4a] ${
-              running ? "opacity-60" : ""
-            }`}
+            className={`rounded-2xl ${running ? "opacity-60" : ""}`}
+            style={{ background: appSettings.tileBg }}
           >
             <label className="flex flex-row items-center justify-between gap-3 px-4 py-2">
               <span className="text-sm font-bold">Double set</span>
@@ -378,6 +394,7 @@ function Index() {
               max={600}
               step={5}
               disabled={running}
+              tileBg={appSettings.tileBg}
             />
           )}
         </div>
@@ -399,7 +416,7 @@ function Index() {
             </button>
           </div>
           {favorites.length === 0 ? (
-            <p className="rounded-2xl bg-[#2a1a4a] px-4 py-3 text-xs font-semibold opacity-70">
+            <p className="rounded-2xl px-4 py-3 text-xs font-semibold opacity-70" style={{ background: appSettings.tileBg }}>
               Save your current setup to recall it in one tap.
             </p>
           ) : (
@@ -412,17 +429,18 @@ function Index() {
                     className={`relative rounded-2xl p-0.5 ${
                       active
                         ? "bg-gradient-to-br from-yellow-300 via-pink-400 to-cyan-300"
-                        : "bg-[#2a1a4a]"
+                        : ""
                     }`}
+                    style={active ? undefined : { background: appSettings.tileBg }}
                   >
                     <button
                       type="button"
                       onClick={() => applyFavorite(fav)}
                       disabled={running}
-                      className={`flex h-24 w-full flex-col items-center justify-center rounded-[calc(1rem-2px)] px-2 text-center text-lg font-extrabold leading-tight transition-colors disabled:opacity-50 ${
+                      className={`flex h-24 w-full flex-col items-center justify-center rounded-[calc(1rem-2px)] px-2 text-center text-lg font-extrabold leading-tight transition-opacity disabled:opacity-50 ${
                         active
                           ? "bg-white text-primary"
-                          : "text-white hover:bg-[#362260]"
+                          : "text-white hover:opacity-90"
                       }`}
                       title={`${fav.settings.sets} sets · ${fav.settings.timePerSet}s · ${fav.settings.restBetweenSets}s rest${fav.settings.doubleSet ? " · double" : ""}`}
                     >
@@ -464,6 +482,7 @@ function Field({
   step = 1,
   suffix,
   disabled,
+  tileBg,
 }: {
   label: string;
   value: number;
@@ -473,13 +492,13 @@ function Field({
   step?: number;
   suffix?: string;
   disabled?: boolean;
+  tileBg?: string;
 }) {
   const clamp = (n: number) => Math.max(min, Math.min(max, n));
   return (
     <div
-      className={`rounded-2xl bg-[#2a1a4a] p-3 ${
-        disabled ? "opacity-60" : ""
-      }`}
+      className={`rounded-2xl p-3 ${disabled ? "opacity-60" : ""}`}
+      style={{ background: tileBg ?? "#2a1a4a" }}
     >
       <div className="flex flex-col items-center gap-2">
         <span className="text-center text-xs font-bold leading-tight">{label}</span>
