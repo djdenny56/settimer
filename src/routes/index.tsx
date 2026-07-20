@@ -155,9 +155,7 @@ function Index() {
   const activeFavoriteId = favorites.find((f) => settingsMatch(f.settings, settings))?.id ?? null;
 
   const saveFavorite = () => {
-    const suggested = `${settings.sets}×${settings.timePerSet}s`;
-    const name = window.prompt("Name this favorite", suggested)?.trim();
-    if (!name) return;
+    const name = `${settings.sets} X ${settings.timePerSet} X ${settings.restBetweenSets}`;
     const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
     setFavorites((f) => [...f, { id, name, settings: { ...settings } }]);
   };
@@ -385,8 +383,8 @@ function Index() {
         </div>
 
         {/* Favorites */}
-        <div className="mt-4">
-          <div className="mb-2 flex items-center justify-between">
+        <div className="mt-5">
+          <div className="mb-3 flex items-center justify-between">
             <span className="text-sm font-extrabold uppercase tracking-wider opacity-90">
               Favorites
             </span>
@@ -405,15 +403,15 @@ function Index() {
               Save your current setup to recall it in one tap.
             </p>
           ) : (
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-3 gap-3">
               {favorites.map((fav) => {
                 const active = fav.id === activeFavoriteId;
                 return (
                   <div
                     key={fav.id}
-                    className={`group flex items-center gap-1 rounded-full p-0.5 ${
+                    className={`relative rounded-2xl p-0.5 ${
                       active
-                        ? "bg-gradient-to-r from-yellow-300 via-pink-400 to-cyan-300"
+                        ? "bg-gradient-to-br from-yellow-300 via-pink-400 to-cyan-300"
                         : "bg-[#2a1a4a]"
                     }`}
                   >
@@ -421,24 +419,23 @@ function Index() {
                       type="button"
                       onClick={() => applyFavorite(fav)}
                       disabled={running}
-                      className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-extrabold transition-colors disabled:opacity-50 ${
+                      className={`flex h-24 w-full flex-col items-center justify-center rounded-[calc(1rem-2px)] px-2 text-center text-lg font-extrabold leading-tight transition-colors disabled:opacity-50 ${
                         active
                           ? "bg-white text-primary"
                           : "text-white hover:bg-[#362260]"
                       }`}
                       title={`${fav.settings.sets} sets · ${fav.settings.timePerSet}s · ${fav.settings.restBetweenSets}s rest${fav.settings.doubleSet ? " · double" : ""}`}
                     >
-                      <Star className={`h-3.5 w-3.5 ${active ? "fill-current" : ""}`} />
                       {fav.name}
                     </button>
                     <button
                       type="button"
                       onClick={() => deleteFavorite(fav.id)}
                       aria-label={`Delete ${fav.name}`}
-                      className={`flex h-6 w-6 items-center justify-center rounded-full transition-colors ${
+                      className={`absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full shadow-md transition-colors ${
                         active
-                          ? "bg-white/70 text-primary hover:bg-white"
-                          : "text-white/70 hover:bg-[#362260] hover:text-white"
+                          ? "bg-primary text-white hover:bg-primary/90"
+                          : "bg-white text-primary hover:bg-white/90"
                       }`}
                     >
                       <X className="h-3.5 w-3.5" />
