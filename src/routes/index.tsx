@@ -320,47 +320,53 @@ function Field({
   const clamp = (n: number) => Math.max(min, Math.min(max, n));
   return (
     <div
-      className={`flex items-center justify-between gap-4 rounded-2xl bg-white/15 p-4 ring-1 ring-white/10 ${
+      className={`rounded-2xl bg-gradient-to-br from-yellow-300/80 via-pink-400/80 via-cyan-300/80 to-lime-300/80 p-[1px] ${
         disabled ? "opacity-60" : ""
       }`}
     >
-      <div className="flex flex-col">
-        <span className="text-sm font-bold">{label}</span>
-        {suffix && <span className="text-xs font-semibold opacity-80">{suffix}</span>}
-      </div>
-      <div className="flex items-center gap-2">
-        <button
-          type="button"
-          disabled={disabled}
-          aria-label={`Decrease ${label}`}
-          onClick={() => onChange(clamp(value - step))}
-          className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-primary shadow-md transition-transform hover:scale-105 active:scale-95 disabled:opacity-50"
-        >
-          <Minus className="h-5 w-5 stroke-[3]" />
-        </button>
-        <input
-          type="number"
-          inputMode="numeric"
-          value={value}
-          min={min}
-          max={max}
-          step={step}
-          disabled={disabled}
-          onChange={(e) => {
-            const n = Number(e.target.value);
-            if (Number.isFinite(n)) onChange(clamp(n));
-          }}
-          className="w-16 rounded-xl bg-white/95 px-2 py-2 text-center text-lg font-extrabold tabular-nums text-primary outline-none focus:ring-2 focus:ring-white disabled:opacity-70"
-        />
-        <button
-          type="button"
-          disabled={disabled}
-          aria-label={`Increase ${label}`}
-          onClick={() => onChange(clamp(value + step))}
-          className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-primary shadow-md transition-transform hover:scale-105 active:scale-95 disabled:opacity-50"
-        >
-          <Plus className="h-5 w-5 stroke-[3]" />
-        </button>
+      <div className="flex items-center justify-between gap-4 rounded-[calc(1rem-1px)] bg-white/15 p-4 backdrop-blur-sm">
+        <div className="flex flex-col">
+          <span className="text-sm font-bold">{label}</span>
+          {suffix && <span className="text-xs font-semibold opacity-80">{suffix}</span>}
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            disabled={disabled}
+            aria-label={`Decrease ${label}`}
+            onClick={() => onChange(clamp(value - step))}
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 via-pink-400 to-cyan-300 p-0.5 shadow-md transition-transform hover:scale-105 active:scale-95 disabled:opacity-50"
+          >
+            <span className="flex h-full w-full items-center justify-center rounded-full bg-white">
+              <Minus className="h-5 w-5 stroke-[3] text-primary" />
+            </span>
+          </button>
+          <input
+            type="number"
+            inputMode="numeric"
+            value={value}
+            min={min}
+            max={max}
+            step={step}
+            disabled={disabled}
+            onChange={(e) => {
+              const n = Number(e.target.value);
+              if (Number.isFinite(n)) onChange(clamp(n));
+            }}
+            className="w-16 rounded-xl bg-white/95 px-2 py-2 text-center text-lg font-extrabold tabular-nums text-primary outline-none focus:ring-2 focus:ring-white disabled:opacity-70"
+          />
+          <button
+            type="button"
+            disabled={disabled}
+            aria-label={`Increase ${label}`}
+            onClick={() => onChange(clamp(value + step))}
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-cyan-300 via-pink-400 to-yellow-300 p-0.5 shadow-md transition-transform hover:scale-105 active:scale-95 disabled:opacity-50"
+          >
+            <span className="flex h-full w-full items-center justify-center rounded-full bg-white">
+              <Plus className="h-5 w-5 stroke-[3] text-primary" />
+            </span>
+          </button>
+        </div>
       </div>
     </div>
   );
