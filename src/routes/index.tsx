@@ -155,9 +155,7 @@ function Index() {
   const activeFavoriteId = favorites.find((f) => settingsMatch(f.settings, settings))?.id ?? null;
 
   const saveFavorite = () => {
-    const suggested = `${settings.sets}×${settings.timePerSet}s`;
-    const name = window.prompt("Name this favorite", suggested)?.trim();
-    if (!name) return;
+    const name = `${settings.sets} X ${settings.timePerSet} X ${settings.restBetweenSets}`;
     const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
     setFavorites((f) => [...f, { id, name, settings: { ...settings } }]);
   };
