@@ -366,9 +366,8 @@ function Index() {
 
         <div className="mt-3 grid grid-cols-1 gap-3">
           <div
-            className={`rounded-2xl bg-[#2a1a4a] ${
-              running ? "opacity-60" : ""
-            }`}
+            className={`rounded-2xl ${running ? "opacity-60" : ""}`}
+            style={{ background: appSettings.tileBg }}
           >
             <label className="flex flex-row items-center justify-between gap-3 px-4 py-2">
               <span className="text-sm font-bold">Double set</span>
@@ -392,6 +391,7 @@ function Index() {
               max={600}
               step={5}
               disabled={running}
+              tileBg={appSettings.tileBg}
             />
           )}
         </div>
@@ -413,7 +413,7 @@ function Index() {
             </button>
           </div>
           {favorites.length === 0 ? (
-            <p className="rounded-2xl bg-[#2a1a4a] px-4 py-3 text-xs font-semibold opacity-70">
+            <p className="rounded-2xl px-4 py-3 text-xs font-semibold opacity-70" style={{ background: appSettings.tileBg }}>
               Save your current setup to recall it in one tap.
             </p>
           ) : (
@@ -426,17 +426,18 @@ function Index() {
                     className={`relative rounded-2xl p-0.5 ${
                       active
                         ? "bg-gradient-to-br from-yellow-300 via-pink-400 to-cyan-300"
-                        : "bg-[#2a1a4a]"
+                        : ""
                     }`}
+                    style={active ? undefined : { background: appSettings.tileBg }}
                   >
                     <button
                       type="button"
                       onClick={() => applyFavorite(fav)}
                       disabled={running}
-                      className={`flex h-24 w-full flex-col items-center justify-center rounded-[calc(1rem-2px)] px-2 text-center text-lg font-extrabold leading-tight transition-colors disabled:opacity-50 ${
+                      className={`flex h-24 w-full flex-col items-center justify-center rounded-[calc(1rem-2px)] px-2 text-center text-lg font-extrabold leading-tight transition-opacity disabled:opacity-50 ${
                         active
                           ? "bg-white text-primary"
-                          : "text-white hover:bg-[#362260]"
+                          : "text-white hover:opacity-90"
                       }`}
                       title={`${fav.settings.sets} sets · ${fav.settings.timePerSet}s · ${fav.settings.restBetweenSets}s rest${fav.settings.doubleSet ? " · double" : ""}`}
                     >
