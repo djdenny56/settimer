@@ -5,6 +5,8 @@ export type AppSettings = {
   appBg: string;
   tileBg: string;
   showMs: boolean;
+  soundEnabled: boolean;
+  vibrateEnabled: boolean;
 };
 
 export const DEFAULT_APP_SETTINGS: AppSettings = {
@@ -12,6 +14,8 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   appBg: "#8B3A1F",
   tileBg: "#2a1a4a",
   showMs: true,
+  soundEnabled: true,
+  vibrateEnabled: true,
 };
 
 const KEY = "workout-timer-app-settings";
