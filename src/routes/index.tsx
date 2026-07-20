@@ -24,8 +24,7 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Workout Timer" },
       {
         property: "og:description",
-        content:
-          "Set it up and go. Sound + vibration cues on every phase.",
+        content: "Set it up and go. Sound + vibration cues on every phase.",
       },
     ],
   }),
@@ -140,23 +139,24 @@ function Index() {
       : `${settings.sets} sets · ${settings.timePerSet}s`;
 
   return (
-    <div className="min-h-screen bg-primary text-primary-foreground">
+    <div className="min-h-screen bg-gradient-to-br from-primary via-primary to-blue-700 text-primary-foreground">
       <div className="mx-auto flex min-h-screen w-full max-w-md flex-col px-5 py-6">
         <header className="mb-4">
-          <h1 className="text-2xl font-bold tracking-tight">Workout Timer</h1>
-          <p className="text-sm opacity-75">Set it up, then hit start.</p>
+          <h1 className="text-2xl font-black tracking-tight">Workout Timer</h1>
+          <p className="text-sm font-semibold opacity-80">Set it up, then hit start.</p>
         </header>
 
         {/* Timer display */}
-        <div className="flex flex-col items-center gap-2 rounded-3xl bg-black/15 px-4 py-8">
-          <div className="text-sm font-medium uppercase tracking-widest opacity-80">
+        <div className="relative flex flex-col items-center gap-2 overflow-hidden rounded-[2rem] bg-white/15 px-4 py-8 shadow-2xl ring-1 ring-white/20 backdrop-blur-sm">
+          <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-yellow-300 via-pink-400 to-cyan-300" />
+          <div className="text-sm font-extrabold uppercase tracking-widest opacity-90">
             {label}
           </div>
-          <div className="flex items-baseline font-bold tabular-nums leading-none">
+          <div className="flex items-baseline font-black tabular-nums leading-none drop-shadow-md">
             <span className="text-8xl">{seconds}</span>
-            <span className="text-3xl opacity-70">.{tenths}</span>
+            <span className="text-3xl opacity-80">.{tenths}</span>
           </div>
-          <div className="text-sm opacity-80">{subline}</div>
+          <div className="text-sm font-bold opacity-85">{subline}</div>
         </div>
 
         {/* Controls */}
@@ -164,7 +164,7 @@ function Index() {
           {!running && !done && (
             <button
               onClick={start}
-              className="flex h-16 flex-1 items-center justify-center gap-2 rounded-2xl bg-white text-lg font-semibold text-primary shadow-lg transition-transform active:scale-[0.98]"
+              className="flex h-16 flex-1 items-center justify-center gap-2 rounded-full bg-white px-8 text-lg font-extrabold text-primary shadow-xl shadow-black/20 transition-transform active:scale-[0.98]"
             >
               <Play className="h-5 w-5 fill-current" />
               Start
@@ -175,14 +175,14 @@ function Index() {
               <button
                 onClick={stop}
                 aria-label="Stop"
-                className="flex h-14 w-14 items-center justify-center rounded-full bg-black/20 hover:bg-black/30"
+                className="flex h-14 w-14 items-center justify-center rounded-full bg-black/20 text-white ring-1 ring-white/20 transition-colors hover:bg-black/30"
               >
                 <RotateCcw className="h-5 w-5" />
               </button>
               <button
                 onClick={() => setPaused((p) => !p)}
                 aria-label={paused ? "Resume" : "Pause"}
-                className="flex h-16 flex-1 items-center justify-center gap-2 rounded-2xl bg-white text-lg font-semibold text-primary shadow-lg transition-transform active:scale-[0.98]"
+                className="flex h-16 flex-1 items-center justify-center gap-2 rounded-full bg-white px-8 text-lg font-extrabold text-primary shadow-xl shadow-black/20 transition-transform active:scale-[0.98]"
               >
                 {paused ? (
                   <>
@@ -199,7 +199,7 @@ function Index() {
               <button
                 onClick={advance}
                 aria-label="Skip"
-                className="flex h-14 w-14 items-center justify-center rounded-full bg-black/20 hover:bg-black/30"
+                className="flex h-14 w-14 items-center justify-center rounded-full bg-black/20 text-white ring-1 ring-white/20 transition-colors hover:bg-black/30"
               >
                 <SkipForward className="h-5 w-5" />
               </button>
@@ -208,7 +208,7 @@ function Index() {
           {done && (
             <button
               onClick={stop}
-              className="flex h-16 flex-1 items-center justify-center gap-2 rounded-2xl bg-white text-lg font-semibold text-primary shadow-lg transition-transform active:scale-[0.98]"
+              className="flex h-16 flex-1 items-center justify-center gap-2 rounded-full bg-white px-8 text-lg font-extrabold text-primary shadow-xl shadow-black/20 transition-transform active:scale-[0.98]"
             >
               <RotateCcw className="h-5 w-5" />
               Reset
@@ -248,20 +248,20 @@ function Index() {
           />
 
           <label
-            className={`flex items-center justify-between gap-4 rounded-xl bg-black/15 p-4 ${
+            className={`flex items-center justify-between gap-4 rounded-2xl bg-white/15 p-4 ring-1 ring-white/10 ${
               running ? "opacity-60" : ""
             }`}
           >
             <div className="flex flex-col">
-              <span className="text-sm font-medium">Double set</span>
-              <span className="text-xs opacity-75">
+              <span className="text-sm font-bold">Double set</span>
+              <span className="text-xs font-semibold opacity-80">
                 e.g. left arm, then right arm
               </span>
             </div>
             <input
               type="checkbox"
               disabled={running}
-              className="relative h-6 w-11 cursor-pointer appearance-none rounded-full bg-black/30 transition-colors before:absolute before:left-0.5 before:top-0.5 before:h-5 before:w-5 before:rounded-full before:bg-white before:transition-transform checked:bg-white/40 checked:before:translate-x-5"
+              className="relative h-6 w-11 cursor-pointer appearance-none rounded-full bg-black/30 transition-colors before:absolute before:left-0.5 before:top-0.5 before:h-5 before:w-5 before:rounded-full before:bg-white before:transition-transform before:shadow-sm checked:bg-white checked:before:translate-x-5"
               checked={settings.doubleSet}
               onChange={(e) => set("doubleSet", e.target.checked)}
             />
@@ -306,13 +306,13 @@ function Field({
   const clamp = (n: number) => Math.max(min, Math.min(max, n));
   return (
     <div
-      className={`flex items-center justify-between gap-4 rounded-xl bg-black/15 p-4 ${
+      className={`flex items-center justify-between gap-4 rounded-2xl bg-white/15 p-4 ring-1 ring-white/10 ${
         disabled ? "opacity-60" : ""
       }`}
     >
       <div className="flex flex-col">
-        <span className="text-sm font-medium">{label}</span>
-        {suffix && <span className="text-xs opacity-75">{suffix}</span>}
+        <span className="text-sm font-bold">{label}</span>
+        {suffix && <span className="text-xs font-semibold opacity-80">{suffix}</span>}
       </div>
       <div className="flex items-center gap-2">
         <button
@@ -320,9 +320,9 @@ function Field({
           disabled={disabled}
           aria-label={`Decrease ${label}`}
           onClick={() => onChange(clamp(value - step))}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-black/25 transition-colors hover:bg-black/40 active:scale-95 disabled:opacity-50"
+          className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-primary shadow-md transition-transform hover:scale-105 active:scale-95 disabled:opacity-50"
         >
-          <Minus className="h-4 w-4" />
+          <Minus className="h-5 w-5 stroke-[3]" />
         </button>
         <input
           type="number"
@@ -336,16 +336,16 @@ function Field({
             const n = Number(e.target.value);
             if (Number.isFinite(n)) onChange(clamp(n));
           }}
-          className="w-16 rounded-md bg-white/95 px-2 py-2 text-center text-lg font-semibold tabular-nums text-primary outline-none focus:ring-2 focus:ring-white disabled:opacity-70"
+          className="w-16 rounded-xl bg-white/95 px-2 py-2 text-center text-lg font-extrabold tabular-nums text-primary outline-none focus:ring-2 focus:ring-white disabled:opacity-70"
         />
         <button
           type="button"
           disabled={disabled}
           aria-label={`Increase ${label}`}
           onClick={() => onChange(clamp(value + step))}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-black/25 transition-colors hover:bg-black/40 active:scale-95 disabled:opacity-50"
+          className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-primary shadow-md transition-transform hover:scale-105 active:scale-95 disabled:opacity-50"
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="h-5 w-5 stroke-[3]" />
         </button>
       </div>
     </div>
