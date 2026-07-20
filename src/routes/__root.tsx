@@ -77,14 +77,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Workout Timer" },
+      {
+        name: "description",
+        content:
+          "A dead-simple workout timer with reps, rest, sets, double-set support, and sound + vibration cues.",
+      },
+      { property: "og:title", content: "Workout Timer" },
+      {
+        property: "og:description",
+        content:
+          "Set reps, time per rep, and rest, then go. Sound + vibration cues on every phase.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
       {
