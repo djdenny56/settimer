@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Minus, Pause, Play, Plus, RotateCcw, SkipForward } from "lucide-react";
+import { Minus, Pause, Play, Plus, RotateCcw, SkipForward, Star, X } from "lucide-react";
 import {
   buildSchedule,
   DEFAULT_SETTINGS,
@@ -11,6 +11,10 @@ import { playCue, unlockAudio } from "@/lib/timer/cues";
 import { useCountdown } from "@/hooks/useCountdown";
 
 const STORAGE_KEY = "workout-timer-settings";
+const FAVORITES_KEY = "workout-timer-favorites";
+
+type Favorite = { id: string; name: string; settings: Settings };
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -34,6 +38,7 @@ export const Route = createFileRoute("/")({
 function Index() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [loaded, setLoaded] = useState(false);
+  const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [running, setRunning] = useState(false);
   const [paused, setPaused] = useState(false);
   const [idx, setIdx] = useState(0);
@@ -44,6 +49,15 @@ function Index() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) setSettings({ ...DEFAULT_SETTINGS, ...JSON.parse(raw) });
+    } catch {
+      // ignore
+    }
+    try {
+      const raw = localStorage.getItem(FAVORITES_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) setFavorites(parsed);
+      }
     } catch {
       // ignore
     }
@@ -58,6 +72,16 @@ function Index() {
       // ignore
     }
   }, [settings, loaded]);
+
+  useEffect(() => {
+    if (!loaded) return;
+    try {
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+    } catch {
+      // ignore
+    }
+  }, [favorites, loaded]);
+
 
   const schedule = useMemo(() => buildSchedule(settings), [settings]);
   const current = schedule[idx];
@@ -120,6 +144,33 @@ function Index() {
     setDone(false);
     setIdx(0);
   };
+
+  const settingsMatch = (a: Settings, b: Settings) =>
+    a.sets === b.sets &&
+    a.timePerSet === b.timePerSet &&
+    a.restBetweenSets === b.restBetweenSets &&
+    a.doubleSet === b.doubleSet &&
+    a.restBetweenSides === b.restBetweenSides;
+
+  const activeFavoriteId = favorites.find((f) => settingsMatch(f.settings, settings))?.id ?? null;
+
+  const saveFavorite = () => {
+    const suggested = `${settings.sets}×${settings.timePerSet}s`;
+    const name = window.prompt("Name this favorite", suggested)?.trim();
+    if (!name) return;
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    setFavorites((f) => [...f, { id, name, settings: { ...settings } }]);
+  };
+
+  const applyFavorite = (fav: Favorite) => {
+    if (running) return;
+    setSettings({ ...DEFAULT_SETTINGS, ...fav.settings });
+  };
+
+  const deleteFavorite = (id: string) => {
+    setFavorites((f) => f.filter((x) => x.id !== id));
+  };
+
 
   const displayRemaining = running
     ? Math.max(0, remaining)
@@ -332,6 +383,73 @@ function Index() {
             />
           )}
         </div>
+
+        {/* Favorites */}
+        <div className="mt-4">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-sm font-extrabold uppercase tracking-wider opacity-90">
+              Favorites
+            </span>
+            <button
+              type="button"
+              onClick={saveFavorite}
+              disabled={running || activeFavoriteId !== null}
+              className="flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-extrabold text-primary shadow-md transition-transform active:scale-95 disabled:opacity-50"
+            >
+              <Star className="h-3.5 w-3.5 fill-current" />
+              Save
+            </button>
+          </div>
+          {favorites.length === 0 ? (
+            <p className="rounded-2xl bg-[#2a1a4a] px-4 py-3 text-xs font-semibold opacity-70">
+              Save your current setup to recall it in one tap.
+            </p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {favorites.map((fav) => {
+                const active = fav.id === activeFavoriteId;
+                return (
+                  <div
+                    key={fav.id}
+                    className={`group flex items-center gap-1 rounded-full p-0.5 ${
+                      active
+                        ? "bg-gradient-to-r from-yellow-300 via-pink-400 to-cyan-300"
+                        : "bg-[#2a1a4a]"
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => applyFavorite(fav)}
+                      disabled={running}
+                      className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-extrabold transition-colors disabled:opacity-50 ${
+                        active
+                          ? "bg-white text-primary"
+                          : "text-white hover:bg-[#362260]"
+                      }`}
+                      title={`${fav.settings.sets} sets · ${fav.settings.timePerSet}s · ${fav.settings.restBetweenSets}s rest${fav.settings.doubleSet ? " · double" : ""}`}
+                    >
+                      <Star className={`h-3.5 w-3.5 ${active ? "fill-current" : ""}`} />
+                      {fav.name}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => deleteFavorite(fav.id)}
+                      aria-label={`Delete ${fav.name}`}
+                      className={`flex h-6 w-6 items-center justify-center rounded-full transition-colors ${
+                        active
+                          ? "bg-white/70 text-primary hover:bg-white"
+                          : "text-white/70 hover:bg-[#362260] hover:text-white"
+                      }`}
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
       </div>
     </div>
   );
