@@ -184,7 +184,7 @@ function Index() {
                   transform="rotate(-90 50 50)"
                   strokeDasharray={TIMER_CIRCUMFERENCE}
                   strokeDashoffset={timerOffset}
-                  className="transition-[stroke-dashoffset] duration-100 ease-linear"
+                  
                 />
               </svg>
 
