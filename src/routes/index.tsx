@@ -383,6 +383,73 @@ function Index() {
             />
           )}
         </div>
+
+        {/* Favorites */}
+        <div className="mt-4">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-sm font-extrabold uppercase tracking-wider opacity-90">
+              Favorites
+            </span>
+            <button
+              type="button"
+              onClick={saveFavorite}
+              disabled={running || activeFavoriteId !== null}
+              className="flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-extrabold text-primary shadow-md transition-transform active:scale-95 disabled:opacity-50"
+            >
+              <Star className="h-3.5 w-3.5 fill-current" />
+              Save
+            </button>
+          </div>
+          {favorites.length === 0 ? (
+            <p className="rounded-2xl bg-[#2a1a4a] px-4 py-3 text-xs font-semibold opacity-70">
+              Save your current setup to recall it in one tap.
+            </p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {favorites.map((fav) => {
+                const active = fav.id === activeFavoriteId;
+                return (
+                  <div
+                    key={fav.id}
+                    className={`group flex items-center gap-1 rounded-full p-0.5 ${
+                      active
+                        ? "bg-gradient-to-r from-yellow-300 via-pink-400 to-cyan-300"
+                        : "bg-[#2a1a4a]"
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => applyFavorite(fav)}
+                      disabled={running}
+                      className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-extrabold transition-colors disabled:opacity-50 ${
+                        active
+                          ? "bg-white text-primary"
+                          : "text-white hover:bg-[#362260]"
+                      }`}
+                      title={`${fav.settings.sets} sets · ${fav.settings.timePerSet}s · ${fav.settings.restBetweenSets}s rest${fav.settings.doubleSet ? " · double" : ""}`}
+                    >
+                      <Star className={`h-3.5 w-3.5 ${active ? "fill-current" : ""}`} />
+                      {fav.name}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => deleteFavorite(fav.id)}
+                      aria-label={`Delete ${fav.name}`}
+                      className={`flex h-6 w-6 items-center justify-center rounded-full transition-colors ${
+                        active
+                          ? "bg-white/70 text-primary hover:bg-white"
+                          : "text-white/70 hover:bg-[#362260] hover:text-white"
+                      }`}
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
       </div>
     </div>
   );
