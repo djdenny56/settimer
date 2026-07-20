@@ -257,7 +257,7 @@ function Index() {
                 </div>
                 <div className="flex items-baseline font-black tabular-nums leading-none drop-shadow-md">
                   <span className="text-8xl">{seconds}</span>
-                  <span className="text-3xl opacity-80">.{tenths}</span>
+                  {appSettings.showMs && <span className="text-3xl opacity-80">.{tenths}</span>}
                 </div>
                 <div className="text-base font-bold opacity-85">{subline}</div>
               </div>
