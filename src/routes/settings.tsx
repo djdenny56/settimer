@@ -65,6 +65,30 @@ function SettingsPage() {
             </label>
           </Row>
 
+          <Row label="Sound" tileBg={s.tileBg}>
+            <label className="flex items-center justify-between">
+              <span className="text-sm opacity-80">Play ding at phase changes</span>
+              <input
+                type="checkbox"
+                checked={s.soundEnabled}
+                onChange={(e) => set("soundEnabled", e.target.checked)}
+                className="relative h-6 w-11 shrink-0 cursor-pointer appearance-none rounded-full bg-white/20 transition-colors before:absolute before:left-0.5 before:top-0.5 before:h-5 before:w-5 before:rounded-full before:bg-white before:transition-transform before:shadow-sm checked:bg-gradient-to-r checked:from-yellow-300 checked:via-pink-400 checked:to-cyan-300 checked:before:translate-x-5"
+              />
+            </label>
+          </Row>
+
+          <Row label="Vibration" tileBg={s.tileBg}>
+            <label className="flex items-center justify-between">
+              <span className="text-sm opacity-80">Buzz at phase changes (mobile)</span>
+              <input
+                type="checkbox"
+                checked={s.vibrateEnabled}
+                onChange={(e) => set("vibrateEnabled", e.target.checked)}
+                className="relative h-6 w-11 shrink-0 cursor-pointer appearance-none rounded-full bg-white/20 transition-colors before:absolute before:left-0.5 before:top-0.5 before:h-5 before:w-5 before:rounded-full before:bg-white before:transition-transform before:shadow-sm checked:bg-gradient-to-r checked:from-yellow-300 checked:via-pink-400 checked:to-cyan-300 checked:before:translate-x-5"
+              />
+            </label>
+          </Row>
+
           <button
             type="button"
             onClick={() => setS(DEFAULT_APP_SETTINGS)}

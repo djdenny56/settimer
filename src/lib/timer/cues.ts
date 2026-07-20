@@ -46,27 +46,35 @@ function vibrate(pattern: number | number[]) {
 
 export type CueKind = "set" | "switch" | "setRest" | "done";
 
+let cueOptions = { sound: true, vibrate: true };
+
+export function setCueOptions(opts: { sound: boolean; vibrate: boolean }) {
+  cueOptions = opts;
+}
+
 export function playCue(kind: CueKind) {
+  const s = cueOptions.sound ? ding : () => {};
+  const v = cueOptions.vibrate ? vibrate : () => {};
   switch (kind) {
     case "set":
-      ding(880, 0.25);
-      vibrate(150);
+      s(880, 0.25);
+      v(150);
       break;
     case "switch":
-      ding(780, 0.2);
-      ding(980, 0.2, 0.22);
-      vibrate([120, 80, 120]);
+      s(780, 0.2);
+      s(980, 0.2, 0.22);
+      v([120, 80, 120]);
       break;
     case "setRest":
-      ding(700, 0.25);
-      ding(900, 0.25, 0.28);
-      vibrate([200, 100, 200]);
+      s(700, 0.25);
+      s(900, 0.25, 0.28);
+      v([200, 100, 200]);
       break;
     case "done":
-      ding(880, 0.25);
-      ding(1100, 0.25, 0.28);
-      ding(1320, 0.4, 0.56);
-      vibrate([300, 120, 300, 120, 500]);
+      s(880, 0.25);
+      s(1100, 0.25, 0.28);
+      s(1320, 0.4, 0.56);
+      v([300, 120, 300, 120, 500]);
       break;
   }
 }

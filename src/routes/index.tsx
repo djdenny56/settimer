@@ -7,7 +7,7 @@ import {
   phaseLabel,
   type Settings,
 } from "@/lib/timer/schedule";
-import { playCue, unlockAudio } from "@/lib/timer/cues";
+import { playCue, setCueOptions, unlockAudio } from "@/lib/timer/cues";
 import { useCountdown } from "@/hooks/useCountdown";
 import { useAppSettings } from "@/lib/appSettings";
 
@@ -83,6 +83,10 @@ function Index() {
       // ignore
     }
   }, [favorites, loaded]);
+
+  useEffect(() => {
+    setCueOptions({ sound: appSettings.soundEnabled, vibrate: appSettings.vibrateEnabled });
+  }, [appSettings.soundEnabled, appSettings.vibrateEnabled]);
 
 
   const schedule = useMemo(() => buildSchedule(settings), [settings]);
