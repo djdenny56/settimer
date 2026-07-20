@@ -380,7 +380,7 @@ function Field({
             const n = Number(e.target.value);
             if (Number.isFinite(n)) onChange(clamp(n));
           }}
-          className="w-full rounded-xl bg-white/95 px-1 py-1 text-center text-2xl font-extrabold tabular-nums text-primary outline-none focus:ring-2 focus:ring-white disabled:opacity-70"
+          className="w-full appearance-none rounded-xl bg-white/95 px-1 py-1 text-center text-2xl font-extrabold tabular-nums text-primary outline-none focus:ring-2 focus:ring-white disabled:opacity-70"
         />
         <div className="flex items-center gap-2">
           <button
