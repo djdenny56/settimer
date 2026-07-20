@@ -91,13 +91,11 @@ export function RunningTimer({ settings, onExit }: Props) {
   const tenths = Math.floor((displayRemaining - seconds) * 10);
 
   const bg =
-    current.kind === "rep"
+    current.kind === "set"
       ? "bg-primary text-primary-foreground"
-      : current.kind === "rest"
-        ? "bg-secondary text-secondary-foreground"
-        : current.kind === "switch"
-          ? "bg-accent text-accent-foreground"
-          : "bg-muted text-muted-foreground";
+      : current.kind === "switch"
+        ? "bg-accent text-accent-foreground"
+        : "bg-secondary text-secondary-foreground";
 
   return (
     <div className={`flex min-h-screen flex-col ${bg} transition-colors`}>
@@ -124,13 +122,7 @@ export function RunningTimer({ settings, onExit }: Props) {
           <span className="text-[9rem]">{seconds}</span>
           <span className="text-5xl opacity-70">.{tenths}</span>
         </div>
-        {current.kind === "rep" || current.kind === "rest" ? (
-          <div className="text-lg font-medium opacity-80">
-            Rep {current.repIndex + 1}/{settings.reps}
-          </div>
-        ) : (
-          <div className="text-lg font-medium opacity-80">&nbsp;</div>
-        )}
+        <div className="text-lg font-medium opacity-80">&nbsp;</div>
       </div>
 
       <div className="flex items-center justify-center gap-4 px-4 pb-10">

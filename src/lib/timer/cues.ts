@@ -44,17 +44,13 @@ function vibrate(pattern: number | number[]) {
   }
 }
 
-export type CueKind = "rep" | "rest" | "switch" | "setRest" | "done";
+export type CueKind = "set" | "switch" | "setRest" | "done";
 
 export function playCue(kind: CueKind) {
   switch (kind) {
-    case "rep":
-      ding(880, 0.18);
-      vibrate(120);
-      break;
-    case "rest":
-      ding(660, 0.18);
-      vibrate(80);
+    case "set":
+      ding(880, 0.25);
+      vibrate(150);
       break;
     case "switch":
       ding(780, 0.2);
