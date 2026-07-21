@@ -141,8 +141,12 @@
     font-family: "Nunito", ui-rounded, "Nunito", system-ui, sans-serif;
   }
 
+  html,
   body {
-    background-color: var(--color-background);
+    background-color: #8b3a1f;
+  }
+
+  body {
     color: var(--color-foreground);
   }
 }

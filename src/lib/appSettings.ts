@@ -7,6 +7,7 @@ export type AppSettings = {
   showMs: boolean;
   soundEnabled: boolean;
   vibrateEnabled: boolean;
+  pipTimerEnabled: boolean;
 };
 
 export const DEFAULT_APP_SETTINGS: AppSettings = {
@@ -16,21 +17,37 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   showMs: true,
   soundEnabled: true,
   vibrateEnabled: true,
+  pipTimerEnabled: true,
 };
 
 const KEY = "workout-timer-app-settings";
+
+function loadAppSettings(): AppSettings {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return DEFAULT_APP_SETTINGS;
+    const parsed = JSON.parse(raw) as Partial<AppSettings> & {
+      backgroundNotificationEnabled?: boolean;
+    };
+    return {
+      ...DEFAULT_APP_SETTINGS,
+      ...parsed,
+      pipTimerEnabled:
+        parsed.pipTimerEnabled ??
+        parsed.backgroundNotificationEnabled ??
+        DEFAULT_APP_SETTINGS.pipTimerEnabled,
+    };
+  } catch {
+    return DEFAULT_APP_SETTINGS;
+  }
+}
 
 export function useAppSettings() {
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_APP_SETTINGS);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(KEY);
-      if (raw) setSettings({ ...DEFAULT_APP_SETTINGS, ...JSON.parse(raw) });
-    } catch {
-      // ignore
-    }
+    setSettings(loadAppSettings());
     setLoaded(true);
   }, []);
 

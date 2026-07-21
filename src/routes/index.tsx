@@ -1,5 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { App } from "@capacitor/app";
+import { Capacitor } from "@capacitor/core";
+import { KeepAwake } from "@capacitor-community/keep-awake";
 import { Minus, Pause, Play, Plus, RotateCcw, Settings as SettingsIcon, SkipForward, Star, X } from "lucide-react";
 import {
   buildSchedule,
@@ -8,6 +11,8 @@ import {
   type Settings,
 } from "@/lib/timer/schedule";
 import { playCue, setCueOptions, unlockAudio } from "@/lib/timer/cues";
+import { buildPiPPhases, prepareTimerPiP, stopTimerPiP, syncAndStartTimerPiP, syncTimerPiPState } from "@/lib/timer/timerPiP";
+import { syncWatchTimerState, WatchSync } from "@/lib/watch/watchSync";
 import { useCountdown } from "@/hooks/useCountdown";
 import { useAppSettings } from "@/lib/appSettings";
 import { SettingsPanel } from "@/components/SettingsPanel";
@@ -17,6 +22,10 @@ const FAVORITES_KEY = "workout-timer-favorites";
 
 type Favorite = { id: string; name: string; settings: Settings };
 
+function formatFavoriteName(s: Settings) {
+  const base = `${s.sets} X ${s.timePerSet} X ${s.restBetweenSets}`;
+  return s.doubleSet ? `${base} DBL` : base;
+}
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -49,7 +58,12 @@ function Index() {
   const [paused, setPaused] = useState(false);
   const [idx, setIdx] = useState(0);
   const [done, setDone] = useState(false);
-  const wakeRef = useRef<WakeLockSentinel | null>(null);
+  const [phaseStartAtMs, setPhaseStartAtMs] = useState<number | null>(null);
+  const pauseRemainingRef = useRef(0);
+  const prevIdxRef = useRef(0);
+  const remainingRef = useRef(0);
+  const pendingWatchCueRef = useRef<string | null>(null);
+  const appActiveRef = useRef(true);
 
   const reorderFavorite = (fromId: string, toId: string) => {
     if (fromId === toId) return;
@@ -105,67 +119,165 @@ function Index() {
     setCueOptions({ sound: appSettings.soundEnabled, vibrate: appSettings.vibrateEnabled });
   }, [appSettings.soundEnabled, appSettings.vibrateEnabled]);
 
+  useEffect(() => {
+    document.documentElement.style.backgroundColor = appSettings.appBg;
+    document.body.style.backgroundColor = appSettings.appBg;
+  }, [appSettings.appBg]);
+
 
   const schedule = useMemo(() => buildSchedule(settings), [settings]);
+  const pipPhases = useMemo(() => buildPiPPhases(schedule, settings), [schedule, settings]);
   const current = schedule[idx];
 
-  // wake lock while running
-  useEffect(() => {
-    if (!running) return;
-    const nav = navigator as Navigator & {
-      wakeLock?: { request: (t: "screen") => Promise<WakeLockSentinel> };
-    };
-    if (nav.wakeLock) {
-      nav.wakeLock
-        .request("screen")
-        .then((s) => {
-          wakeRef.current = s;
-        })
-        .catch(() => {});
-    }
-    return () => {
-      wakeRef.current?.release().catch(() => {});
-      wakeRef.current = null;
-    };
-  }, [running]);
+  const syncFromWallClock = useCallback(() => {
+    if (!running || paused || done || phaseStartAtMs == null) return;
 
-  const advance = () => {
+    const now = Date.now();
+    let phaseStart = phaseStartAtMs;
+    let i = idx;
+
+    while (i < schedule.length) {
+      const durMs = schedule[i].duration * 1000;
+      const phaseEnd = phaseStart + durMs;
+      if (now < phaseEnd) {
+        if (i !== idx) setIdx(i);
+        if (phaseStart !== phaseStartAtMs) setPhaseStartAtMs(phaseStart);
+        return;
+      }
+      phaseStart = phaseEnd;
+      i++;
+    }
+
+    playCue("done");
+    pendingWatchCueRef.current = "done";
+    setDone(true);
+    setRunning(false);
+    setPhaseStartAtMs(null);
+    stopTimerPiP();
+  }, [running, paused, done, phaseStartAtMs, idx, schedule]);
+
+  const advance = useCallback(() => {
     setIdx((i) => {
       const ending = schedule[i];
       const next = i + 1;
       if (next >= schedule.length) {
         playCue("done");
+        pendingWatchCueRef.current = "done";
         setDone(true);
         setRunning(false);
+        setPhaseStartAtMs(null);
+        stopTimerPiP();
         return i;
       }
-      if (ending) playCue(ending.kind);
+      if (ending) {
+        playCue(ending.kind);
+        pendingWatchCueRef.current = ending.kind;
+      }
       return next;
     });
-  };
+  }, [schedule]);
 
   const remaining = useCountdown(
     current?.duration ?? 0,
     running && !paused && !done,
     advance,
     idx,
+    phaseStartAtMs,
   );
+
+  remainingRef.current = remaining;
+
+  useEffect(() => {
+    if (!running || paused || done) return;
+    if (prevIdxRef.current === idx) return;
+    setPhaseStartAtMs(Date.now());
+    prevIdxRef.current = idx;
+  }, [idx, running, paused, done]);
+
+  // Keep screen on while timer is active in the foreground (native + web fallback).
+  useEffect(() => {
+    const active = running && !done;
+    if (!active) {
+      if (Capacitor.isNativePlatform()) void KeepAwake.allowSleep().catch(() => {});
+      return;
+    }
+
+    if (Capacitor.isNativePlatform()) {
+      if (appActiveRef.current) void KeepAwake.keepAwake().catch(() => {});
+    } else {
+      const nav = navigator as Navigator & {
+        wakeLock?: { request: (t: "screen") => Promise<WakeLockSentinel> };
+      };
+      let sentinel: WakeLockSentinel | null = null;
+      if (nav.wakeLock && appActiveRef.current) {
+        void nav.wakeLock.request("screen").then((s) => {
+          sentinel = s;
+        });
+      }
+      return () => {
+        sentinel?.release().catch(() => {});
+      };
+    }
+
+    return () => {
+      if (Capacitor.isNativePlatform()) void KeepAwake.allowSleep().catch(() => {});
+    };
+  }, [running, done]);
+
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+
+    const appSub = App.addListener("appStateChange", ({ isActive }) => {
+      appActiveRef.current = isActive;
+
+      if (isActive) {
+        void KeepAwake.allowSleep().catch(() => {});
+        syncFromWallClock();
+        if (running && !done) void KeepAwake.keepAwake().catch(() => {});
+        return;
+      }
+
+      if (running && !paused && !done && phaseStartAtMs != null && appSettings.pipTimerEnabled) {
+        void syncAndStartTimerPiP({
+          enabled: appSettings.pipTimerEnabled,
+          running,
+          paused,
+          done,
+          showMs: appSettings.showMs,
+          idx,
+          phaseStartAtMs,
+          tileBg: appSettings.tileBg,
+          phases: pipPhases,
+        });
+      }
+    });
+
+    return () => {
+      void appSub.then((h) => h.remove());
+    };
+  }, [running, done, paused, idx, phaseStartAtMs, pipPhases, appSettings.pipTimerEnabled, appSettings.showMs, appSettings.tileBg, syncFromWallClock]);
 
   const set = <K extends keyof Settings>(k: K, v: Settings[K]) =>
     setSettings((s) => ({ ...s, [k]: v }));
 
   const start = () => {
     unlockAudio();
+    if (appSettings.pipTimerEnabled) prepareTimerPiP();
+    const now = Date.now();
     setIdx(0);
     setDone(false);
     setPaused(false);
     setRunning(true);
+    setPhaseStartAtMs(now);
+    prevIdxRef.current = 0;
   };
   const stop = () => {
     setRunning(false);
     setPaused(false);
     setDone(false);
     setIdx(0);
+    setPhaseStartAtMs(null);
+    stopTimerPiP();
   };
 
   const settingsMatch = (a: Settings, b: Settings) =>
@@ -178,7 +290,7 @@ function Index() {
   const activeFavoriteId = favorites.find((f) => settingsMatch(f.settings, settings))?.id ?? null;
 
   const saveFavorite = () => {
-    const name = `${settings.sets} X ${settings.timePerSet} X ${settings.restBetweenSets}`;
+    const name = formatFavoriteName(settings);
     const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
     setFavorites((f) => [...f, { id, name, settings: { ...settings } }]);
   };
@@ -186,6 +298,7 @@ function Index() {
   const applyFavorite = (fav: Favorite) => {
     if (running) return;
     setSettings({ ...DEFAULT_SETTINGS, ...fav.settings });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const deleteFavorite = (id: string) => {
@@ -217,9 +330,88 @@ function Index() {
       ? `Set ${current.setIndex + 1}/${settings.sets}${current.side ? ` · Side ${current.side}` : ""}`
       : `${settings.sets} sets · ${settings.timePerSet}s`;
 
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    syncWatchTimerState({
+      running,
+      paused,
+      done,
+      remainingSec: remainingRef.current,
+      phaseEndAtMs: phaseStartAtMs,
+      phaseLabel: label,
+      subline,
+      title: appSettings.title,
+      vibrateEnabled: appSettings.vibrateEnabled,
+      cue: pendingWatchCueRef.current ?? undefined,
+    });
+    pendingWatchCueRef.current = null;
+  }, [
+    running,
+    paused,
+    done,
+    idx,
+    phaseStartAtMs,
+    label,
+    subline,
+    appSettings.title,
+    appSettings.vibrateEnabled,
+    remaining,
+  ]);
+
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    syncTimerPiPState({
+      enabled: appSettings.pipTimerEnabled,
+      running,
+      paused,
+      done,
+      showMs: appSettings.showMs,
+      idx,
+      phaseStartAtMs,
+      tileBg: appSettings.tileBg,
+      phases: pipPhases,
+    });
+  }, [
+    running,
+    paused,
+    done,
+    idx,
+    phaseStartAtMs,
+    pipPhases,
+    appSettings.pipTimerEnabled,
+    appSettings.showMs,
+    appSettings.tileBg,
+    remaining,
+  ]);
+
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+
+    const sub = WatchSync.addListener("watchCommand", ({ command }) => {
+      if (command === "pause" && running && !paused && !done) {
+        pauseRemainingRef.current = remainingRef.current;
+        setPaused(true);
+      } else if (command === "resume" && running && paused && !done) {
+        const phase = schedule[idx];
+        if (phase) {
+          setPhaseStartAtMs(
+            Date.now() - (phase.duration - pauseRemainingRef.current) * 1000,
+          );
+        }
+        setPaused(false);
+      } else if (command === "skip" && running && !done) {
+        advance();
+      }
+    });
+
+    return () => {
+      void sub.then((h) => h.remove());
+    };
+  }, [running, paused, done, schedule, idx, advance]);
+
   return (
     <div
-      className="min-h-screen text-white"
+      className="min-h-screen text-white pt-[env(safe-area-inset-top,0px)] pr-[env(safe-area-inset-right,0px)] pb-[env(safe-area-inset-bottom,0px)] pl-[env(safe-area-inset-left,0px)]"
       style={{ background: `linear-gradient(to bottom, ${appSettings.appBg}dd, ${appSettings.appBg})` }}
     >
       <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col px-5 py-6">
@@ -321,7 +513,21 @@ function Index() {
               </button>
               <div className="flex-1 rounded-full bg-gradient-to-r from-yellow-300 via-pink-400 to-cyan-300 p-1 shadow-xl shadow-black/25">
                 <button
-                  onClick={() => setPaused((p) => !p)}
+                  onClick={() => {
+                    unlockAudio();
+                    if (paused) {
+                      const phase = schedule[idx];
+                      if (phase) {
+                        setPhaseStartAtMs(
+                          Date.now() - (phase.duration - pauseRemainingRef.current) * 1000,
+                        );
+                      }
+                      setPaused(false);
+                    } else {
+                      pauseRemainingRef.current = remainingRef.current;
+                      setPaused(true);
+                    }
+                  }}
                   aria-label={paused ? "Resume" : "Pause"}
                   className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-white px-8 text-lg font-extrabold text-primary transition-transform active:scale-[0.98]"
                 >
@@ -359,6 +565,101 @@ function Index() {
                 Reset
               </button>
             </div>
+          )}
+        </div>
+
+        {/* Favorites */}
+        <div className="mt-4">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-sm font-extrabold uppercase tracking-wider opacity-90">
+              Favorites
+            </span>
+            <button
+              type="button"
+              onClick={saveFavorite}
+              disabled={running || activeFavoriteId !== null}
+              className="flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-extrabold text-primary shadow-md transition-transform active:scale-95 disabled:opacity-50"
+            >
+              <Star className="h-3.5 w-3.5 fill-current" />
+              Save
+            </button>
+          </div>
+          {favorites.length === 0 ? (
+            <p className="rounded-2xl px-4 py-2.5 text-xs font-semibold opacity-70" style={{ background: appSettings.tileBg }}>
+              Save your current setup to recall it in one tap.
+            </p>
+          ) : (
+            <div className="grid grid-cols-3 gap-2">
+              {favorites.map((fav) => {
+                const active = fav.id === activeFavoriteId;
+                const isDragOver = dragOverId === fav.id && dragId !== fav.id;
+                return (
+                  <div
+                    key={fav.id}
+                    draggable={!running}
+                    onDragStart={(e) => {
+                      if (running) return;
+                      setDragId(fav.id);
+                      e.dataTransfer.effectAllowed = "move";
+                    }}
+                    onDragOver={(e) => {
+                      if (dragId === null) return;
+                      e.preventDefault();
+                      e.dataTransfer.dropEffect = "move";
+                      if (dragOverId !== fav.id) setDragOverId(fav.id);
+                    }}
+                    onDragLeave={() => {
+                      if (dragOverId === fav.id) setDragOverId(null);
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      if (dragId) reorderFavorite(dragId, fav.id);
+                      setDragId(null);
+                      setDragOverId(null);
+                    }}
+                    onDragEnd={() => {
+                      setDragId(null);
+                      setDragOverId(null);
+                    }}
+                    className={`relative rounded-xl p-0.5 transition-all ${
+                      active
+                        ? "bg-gradient-to-br from-yellow-300 via-pink-400 to-cyan-300"
+                        : ""
+                    } ${dragId === fav.id ? "opacity-40" : ""} ${
+                      isDragOver ? "scale-105 ring-2 ring-white/70" : ""
+                    } ${running ? "" : "cursor-grab active:cursor-grabbing"}`}
+                    style={active ? undefined : { background: appSettings.tileBg }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => applyFavorite(fav)}
+                      disabled={running}
+                      className={`flex min-h-[2.75rem] w-full items-center justify-center rounded-[calc(0.75rem-2px)] px-1.5 py-2 text-center text-sm font-extrabold leading-tight transition-opacity disabled:opacity-50 ${
+                        active
+                          ? "bg-white text-primary"
+                          : "text-white hover:opacity-90"
+                      }`}
+                      title={`${fav.settings.sets} sets · ${fav.settings.timePerSet}s · ${fav.settings.restBetweenSets}s rest${fav.settings.doubleSet ? " · double" : ""}`}
+                    >
+                      {formatFavoriteName(fav.settings)}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => deleteFavorite(fav.id)}
+                      aria-label={`Delete ${fav.name}`}
+                      className={`absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full shadow-md transition-colors ${
+                        active
+                          ? "bg-primary text-white hover:bg-primary/90"
+                          : "bg-white text-primary hover:bg-white/90"
+                      }`}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+
           )}
         </div>
 
@@ -407,7 +708,7 @@ function Index() {
               <input
                 type="checkbox"
                 disabled={running}
-                className="relative h-6 w-11 shrink-0 cursor-pointer appearance-none rounded-full bg-gradient-to-r from-yellow-300 via-pink-400 to-cyan-300 transition-colors before:absolute before:left-0.5 before:top-0.5 before:h-5 before:w-5 before:rounded-full before:bg-white before:transition-transform before:shadow-sm checked:from-cyan-300 checked:via-pink-400 checked:to-yellow-300 checked:before:translate-x-5"
+                className="relative h-6 w-11 shrink-0 cursor-pointer appearance-none rounded-full bg-white/20 transition-colors before:absolute before:left-0.5 before:top-0.5 before:h-5 before:w-5 before:rounded-full before:bg-white before:transition-transform before:shadow-sm checked:bg-gradient-to-r checked:from-yellow-300 checked:via-pink-400 checked:to-cyan-300 checked:before:translate-x-5 disabled:opacity-50"
                 checked={settings.doubleSet}
                 onChange={(e) => set("doubleSet", e.target.checked)}
               />
@@ -426,101 +727,6 @@ function Index() {
               disabled={running}
               tileBg={appSettings.tileBg}
             />
-          )}
-        </div>
-
-        {/* Favorites */}
-        <div className="mt-5">
-          <div className="mb-3 flex items-center justify-between">
-            <span className="text-sm font-extrabold uppercase tracking-wider opacity-90">
-              Favorites
-            </span>
-            <button
-              type="button"
-              onClick={saveFavorite}
-              disabled={running || activeFavoriteId !== null}
-              className="flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-extrabold text-primary shadow-md transition-transform active:scale-95 disabled:opacity-50"
-            >
-              <Star className="h-3.5 w-3.5 fill-current" />
-              Save
-            </button>
-          </div>
-          {favorites.length === 0 ? (
-            <p className="rounded-2xl px-4 py-3 text-xs font-semibold opacity-70" style={{ background: appSettings.tileBg }}>
-              Save your current setup to recall it in one tap.
-            </p>
-          ) : (
-            <div className="grid grid-cols-3 gap-3">
-              {favorites.map((fav) => {
-                const active = fav.id === activeFavoriteId;
-                const isDragOver = dragOverId === fav.id && dragId !== fav.id;
-                return (
-                  <div
-                    key={fav.id}
-                    draggable={!running}
-                    onDragStart={(e) => {
-                      if (running) return;
-                      setDragId(fav.id);
-                      e.dataTransfer.effectAllowed = "move";
-                    }}
-                    onDragOver={(e) => {
-                      if (dragId === null) return;
-                      e.preventDefault();
-                      e.dataTransfer.dropEffect = "move";
-                      if (dragOverId !== fav.id) setDragOverId(fav.id);
-                    }}
-                    onDragLeave={() => {
-                      if (dragOverId === fav.id) setDragOverId(null);
-                    }}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      if (dragId) reorderFavorite(dragId, fav.id);
-                      setDragId(null);
-                      setDragOverId(null);
-                    }}
-                    onDragEnd={() => {
-                      setDragId(null);
-                      setDragOverId(null);
-                    }}
-                    className={`relative rounded-2xl p-0.5 transition-all ${
-                      active
-                        ? "bg-gradient-to-br from-yellow-300 via-pink-400 to-cyan-300"
-                        : ""
-                    } ${dragId === fav.id ? "opacity-40" : ""} ${
-                      isDragOver ? "scale-105 ring-2 ring-white/70" : ""
-                    } ${running ? "" : "cursor-grab active:cursor-grabbing"}`}
-                    style={active ? undefined : { background: appSettings.tileBg }}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => applyFavorite(fav)}
-                      disabled={running}
-                      className={`flex h-24 w-full flex-col items-center justify-center rounded-[calc(1rem-2px)] px-2 text-center text-lg font-extrabold leading-tight transition-opacity disabled:opacity-50 ${
-                        active
-                          ? "bg-white text-primary"
-                          : "text-white hover:opacity-90"
-                      }`}
-                      title={`${fav.settings.sets} sets · ${fav.settings.timePerSet}s · ${fav.settings.restBetweenSets}s rest${fav.settings.doubleSet ? " · double" : ""}`}
-                    >
-                      {fav.name}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => deleteFavorite(fav.id)}
-                      aria-label={`Delete ${fav.name}`}
-                      className={`absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full shadow-md transition-colors ${
-                        active
-                          ? "bg-primary text-white hover:bg-primary/90"
-                          : "bg-white text-primary hover:bg-white/90"
-                      }`}
-                    >
-                      <X className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-
           )}
         </div>
 

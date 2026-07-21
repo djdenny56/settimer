@@ -15,8 +15,8 @@ export function SettingsPanel({
 
   return (
     <div
-      className="fixed inset-0 z-50 overflow-y-auto text-white"
-      style={{ background: `linear-gradient(to bottom, ${s.appBg}dd, ${s.appBg})` }}
+      className="fixed inset-0 z-50 overflow-y-auto text-white pt-[env(safe-area-inset-top,0px)] pr-[env(safe-area-inset-right,0px)] pb-[env(safe-area-inset-bottom,0px)] pl-[env(safe-area-inset-left,0px)]"
+      style={{ background: s.appBg }}
     >
       <div className="mx-auto flex min-h-screen w-full max-w-md flex-col px-5 py-6">
         <header className="mb-6 flex items-center gap-3">
@@ -81,6 +81,20 @@ export function SettingsPanel({
                 type="checkbox"
                 checked={s.vibrateEnabled}
                 onChange={(e) => set("vibrateEnabled", e.target.checked)}
+                className="relative h-6 w-11 shrink-0 cursor-pointer appearance-none rounded-full bg-white/20 transition-colors before:absolute before:left-0.5 before:top-0.5 before:h-5 before:w-5 before:rounded-full before:bg-white before:transition-transform before:shadow-sm checked:bg-gradient-to-r checked:from-yellow-300 checked:via-pink-400 checked:to-cyan-300 checked:before:translate-x-5"
+              />
+            </label>
+          </Row>
+
+          <Row label="Picture-in-picture" tileBg={s.tileBg}>
+            <label className="flex items-center justify-between">
+              <span className="text-sm opacity-80">
+                Show a floating timer when you leave the app mid-workout
+              </span>
+              <input
+                type="checkbox"
+                checked={s.pipTimerEnabled}
+                onChange={(e) => set("pipTimerEnabled", e.target.checked)}
                 className="relative h-6 w-11 shrink-0 cursor-pointer appearance-none rounded-full bg-white/20 transition-colors before:absolute before:left-0.5 before:top-0.5 before:h-5 before:w-5 before:rounded-full before:bg-white before:transition-transform before:shadow-sm checked:bg-gradient-to-r checked:from-yellow-300 checked:via-pink-400 checked:to-cyan-300 checked:before:translate-x-5"
               />
             </label>
